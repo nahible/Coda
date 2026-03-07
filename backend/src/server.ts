@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import authRouter from "./routes/auth.js";
+import todoRouter from "./routes/todo.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 5001);
@@ -11,12 +12,13 @@ app.use(
   cors({
     origin: FRONTEND_URL,
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 
 // Mount auth routes at /auth
 app.use("/auth", authRouter);
+app.use("/todos", todoRouter);
 
 app.get("/", (req, res) => {
   res.send("Coda Backend is running!");
