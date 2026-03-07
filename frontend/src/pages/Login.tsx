@@ -1,8 +1,14 @@
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { loginWithGoogle } from '../api/auth';
+
 const Login = () => {
-  const handleGoogleLogin = () => {
-    // TODO: redirect to Google OAuth endpoint
-    console.log("Redirecting to Google OAuth...");
-  };
+  const { isLoggedIn } = useAuth();
+
+  // Already logged in — skip to homepage
+  if (isLoggedIn) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#c9bfd6]">
@@ -34,7 +40,7 @@ const Login = () => {
 
         {/* Google Sign-In Button */}
         <button
-          onClick={handleGoogleLogin}
+          onClick={loginWithGoogle}
           className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-full border border-[#d4d4d4] bg-white text-[#1a1a1a] text-[15px] font-medium cursor-pointer transition-all duration-200 hover:bg-[#f0edf3] hover:border-[#b0a4bd] hover:shadow-md active:scale-[0.98]"
         >
           {/* Google "G" icon */}
@@ -63,4 +69,4 @@ const Login = () => {
   );
 };
 
-export default Login
+export default Login;
