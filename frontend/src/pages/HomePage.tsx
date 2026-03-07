@@ -39,6 +39,12 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
         },
         gridRef.current
       );
+
+      // Forcefully apply minimum size constraints that HTML attributes sometimes drop
+      const spotifyEl = document.getElementById('spotify-item');
+      if (spotifyEl && gridInstanceRef.current) {
+        gridInstanceRef.current.update(spotifyEl, { minW: 3, minH: 4 });
+      }
     }
 
     return () => {
@@ -58,7 +64,7 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
       <main className="flex-1 min-h-0 overflow-y-auto">
         <div className="grid-stack" ref={gridRef}>
           {/* Spotify Player */}
-          <div className="grid-stack-item" gs-x="0" gs-y="0" gs-w="4" gs-h="6" gs-min-w="3" gs-min-h="5">
+          <div className="grid-stack-item" id="spotify-item" gs-x="0" gs-y="0" gs-w="4" gs-h="6" gs-min-w="4" gs-min-h="5">
             <div className="grid-stack-item-content">
               <SpotifyPlayer />
             </div>
