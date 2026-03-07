@@ -1,7 +1,12 @@
-const Login = () => {
+import { getGoogleAuthUrl } from '../api/auth';
+
+type LoginProps = {
+  errorMessage?: string | null;
+};
+
+const Login = ({ errorMessage }: LoginProps) => {
   const handleGoogleLogin = () => {
-    // TODO: redirect to Google OAuth endpoint
-    console.log("Redirecting to Google OAuth...");
+    window.location.href = getGoogleAuthUrl();
   };
 
   return (
@@ -58,6 +63,9 @@ const Login = () => {
           </svg>
           Continue with Google
         </button>
+        {errorMessage ? (
+          <p className="text-center text-sm text-[#b24c58]">{errorMessage}</p>
+        ) : null}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   LayoutDashboard,
+  LogOut,
   Music,
   Timer,
   ListTodo,
@@ -8,6 +9,7 @@ import {
   Settings,
   Zap,
 } from 'lucide-react';
+import type { AuthUser } from '../api/auth';
 
 const navItems = [
   { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -18,8 +20,14 @@ const navItems = [
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 
-export default function Sidebar() {
+type SidebarProps = {
+  onLogout: () => void | Promise<void>;
+  user: AuthUser;
+};
+
+export default function Sidebar({ onLogout, user }: SidebarProps) {
   const [active, setActive] = useState('dashboard');
+  const userInitial = user.name.trim().charAt(0).toUpperCase() || 'C';
 
   return (
     <aside
@@ -58,9 +66,20 @@ export default function Sidebar() {
       {/* Spacer */}
       <div className="h-8" />
 
-      {/* User avatar — inset from bottom */}
-      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent-strong to-accent-muted flex items-center justify-center text-ink-on-accent font-semibold text-[0.75rem]">
-        C
+      <div className="flex flex-col items-center gap-3 pb-1">
+        <button
+          className="w-11 h-11 flex items-center justify-center rounded-[14px] text-ink-muted hover:bg-panel-inner hover:text-ink-secondary transition-all duration-200 cursor-pointer"
+          onClick={() => void onLogout()}
+          title="Log out"
+        >
+          <LogOut size={19} strokeWidth={1.4} />
+        </button>
+        <div
+          className="w-9 h-9 rounded-full bg-gradient-to-br from-accent-strong to-accent-muted flex items-center justify-center text-ink-on-accent font-semibold text-[0.75rem]"
+          title={user.email}
+        >
+          {userInitial}
+        </div>
       </div>
     </aside>
   );
