@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
 
 /**
  * Redirect the browser to the backend's Google OAuth login route.
