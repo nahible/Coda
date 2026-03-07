@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import authRouter from "./routes/auth.js";
+import spotifyRouter from "./routes/spotify.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 5001);
@@ -17,6 +18,9 @@ app.use(express.json());
 
 // Mount auth routes at /auth
 app.use("/auth", authRouter);
+
+// Mount spotify routes at /spotify
+app.use("/spotify", spotifyRouter);
 
 app.get("/", (req, res) => {
   res.send("Coda Backend is running!");
