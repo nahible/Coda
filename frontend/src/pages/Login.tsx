@@ -39,7 +39,7 @@ const Login = ({ errorMessage }: LoginProps) => {
 
         {/* Google Sign-In Button */}
         <button
-          onClick={loginWithGoogle}
+          onClick={handleGoogleLogin}
           className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-full border border-[#d4d4d4] bg-white text-[#1a1a1a] text-[15px] font-medium cursor-pointer transition-all duration-200 hover:bg-[#f0edf3] hover:border-[#b0a4bd] hover:shadow-md active:scale-[0.98]"
         >
           {/* Google "G" icon */}
