@@ -1,14 +1,13 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { loginWithGoogle } from '../api/auth';
+import { getGoogleAuthUrl } from "../api/auth";
 
-const Login = () => {
-  const { isLoggedIn } = useAuth();
+type LoginProps = {
+  errorMessage?: string | null;
+};
 
-  // Already logged in — skip to homepage
-  if (isLoggedIn) {
-    return <Navigate to="/" replace />;
-  }
+const Login = ({ errorMessage }: LoginProps) => {
+  const handleGoogleLogin = () => {
+    window.location.href = getGoogleAuthUrl();
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#c9bfd6]">
@@ -64,6 +63,9 @@ const Login = () => {
           </svg>
           Continue with Google
         </button>
+        {errorMessage ? (
+          <p className="text-center text-sm text-[#b24c58]">{errorMessage}</p>
+        ) : null}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { GridStack } from 'gridstack';
+import type { AuthUser } from '../api/auth';
 import Sidebar from '../components/Sidebar';
 import SpotifyPlayer from '../components/SpotifyPlayer';
 import PomodoroTimer from '../components/PomodoroTimer';
@@ -13,7 +14,12 @@ const initialTodos: Todo[] = [
   { id: 3, text: 'Design component architecture', done: false },
 ];
 
-export default function HomePage() {
+type HomePageProps = {
+  onLogout: () => void | Promise<void>;
+  user: AuthUser;
+};
+
+export default function HomePage({ onLogout, user }: HomePageProps) {
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
   const gridRef = useRef<HTMLDivElement>(null);
   const gridInstanceRef = useRef<GridStack | null>(null);
@@ -46,7 +52,7 @@ export default function HomePage() {
   return (
     <div className="flex h-screen p-6 gap-6" id="app-shell">
       {/* Sidebar — outside the grid */}
-      <Sidebar />
+      <Sidebar onLogout={onLogout} user={user} />
 
       {/* Gridstack Bento Grid */}
       <main className="flex-1 min-h-0 overflow-y-auto">

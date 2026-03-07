@@ -1,66 +1,38 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-/**
- * Redirect the browser to the backend's Google OAuth login route.
- * The backend is responsible for generating the Google consent URL
- * and redirecting the user there.
- */
-export function loginWithGoogle(): void {
-  window.location.href = `${API_BASE}/auth/google`;
-}
+export type AuthUser = {
+  email: string;
+  googleId: string;
+  id: number;
+  name: string;
+};
 
-/**
- * Exchange the Google OAuth callback code for a session / JWT.
- *
- * After Google redirects the user back to your app with a `code` query
- * parameter, call this function to send that code to your backend,
- * which will verify it with Google and return a token.
- *
- * @param code - The authorization code from Google's OAuth callback.
- * @returns The JSON response from your backend (e.g. `{ token, user }`).
- */
-export async function handleGoogleCallback(code: string) {
-  const res = await fetch(`${API_BASE}/auth/google/callback`, {
+export const getGoogleAuthUrl = () => `${API_BASE_URL}/auth/google`;
+
+export const getCurrentUser = async (): Promise<AuthUser | null> => {
+  const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    credentials: "include",
+  });
+
+  if (response.status === 401) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch current user.");
+  }
+
+  const payload = (await response.json()) as { user: AuthUser };
+  return payload.user;
+};
+
+export const logout = async () => {
+  const response = await fetch(`${API_BASE_URL}/auth/logout`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code }),
+    credentials: "include",
   });
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.message ?? "Google authentication failed");
+  if (!response.ok && response.status !== 204) {
+    throw new Error("Failed to log out.");
   }
-
-  return res.json(); // e.g. { token: "...", user: { id, name, email, avatar } }
-}
-
-/**
- * (Optional) Log the user out by hitting the backend logout endpoint.
- */
-export async function logout(): Promise<void> {
-  await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" });
-}
-
-/**
- * Validates the user's current session/token with the backend.
- * This makes a fetch request to the `/api/auth` endpoint.
- * 
- * @param token - The JWT auth token to verify.
- * @returns The user data or validation response from the backend.
- */
-export async function verifyAuthSession(token: string) {
-  const res = await fetch(`${API_BASE}/api/auth`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.message ?? "Failed to verify authentication");
-  }
-
-  return res.json();
-}
+};
