@@ -40,3 +40,27 @@ export async function handleGoogleCallback(code: string) {
 export async function logout(): Promise<void> {
   await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" });
 }
+
+/**
+ * Validates the user's current session/token with the backend.
+ * This makes a fetch request to the `/api/auth` endpoint.
+ * 
+ * @param token - The JWT auth token to verify.
+ * @returns The user data or validation response from the backend.
+ */
+export async function verifyAuthSession(token: string) {
+  const res = await fetch(`${API_BASE}/api/auth`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(error.message ?? "Failed to verify authentication");
+  }
+
+  return res.json();
+}
