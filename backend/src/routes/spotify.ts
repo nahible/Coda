@@ -91,6 +91,11 @@ const getValidAccessToken = async (userId: number): Promise<string | null> => {
 // OAuth Flow
 // ==========================================
 
+import crypto from "crypto";
+// Temporary store to cross the localhost -> 127.0.0.1 domain gap.
+// Maps a random state string -> userId
+const authStateMap = new Map<string, number>();
+
 // 1. Redirect to Spotify Auth
 router.get("/auth", (req, res) => {
   const userId = requireAuth(req, res);
@@ -98,24 +103,37 @@ router.get("/auth", (req, res) => {
 
   const scope = "user-read-currently-playing user-modify-playback-state";
   const authUrl = new URL("https://accounts.spotify.com/authorize");
+  
+  // Generate a random state so we can securely track the user across the domain gap
+  const state = crypto.randomUUID();
+  authStateMap.set(state, userId);
+
   authUrl.searchParams.set("client_id", SPOTIFY_CLIENT_ID!);
   authUrl.searchParams.set("response_type", "code");
   authUrl.searchParams.set("redirect_uri", SPOTIFY_REDIRECT_URI);
   authUrl.searchParams.set("scope", scope);
+  authUrl.searchParams.set("state", state);
 
   res.redirect(authUrl.toString());
 });
 
 // 2. Spotify Auth Callback
 router.get("/callback", async (req, res) => {
-  const userId = requireAuth(req, res);
-  if (!userId) return;
-
   const code = String(req.query.code || "");
-  if (!code) {
-    res.status(400).send("No code provided.");
+  const state = String(req.query.state || "");
+  
+  if (!code || !state) {
+    res.status(400).send("No code or state provided.");
     return;
   }
+
+  // Retrieve user ID from the state map and delete it
+  const userId = authStateMap.get(state);
+  if (!userId) {
+    res.status(401).send("Invalid or expired authentication state. Please try logging in again.");
+    return;
+  }
+  authStateMap.delete(state);
 
   try {
     const basicAuth = Buffer.from(

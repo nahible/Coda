@@ -1,4 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+const SPOTIFY_API_BASE = `${API_BASE}/auth/spotify`;
 
 export interface SpotifyTrack {
   title: string;
@@ -13,14 +14,14 @@ export interface SpotifyTrack {
  * Redirects the user to the backend to start the Spotify OAuth flow.
  */
 export function connectSpotify(): void {
-  window.location.href = `${API_BASE}/spotify/auth`;
+  window.location.href = `${SPOTIFY_API_BASE}/auth`;
 }
 
 /**
  * Checks if the current user has connected their Spotify account.
  */
 export async function fetchSpotifyStatus(): Promise<boolean> {
-  const res = await fetch(`${API_BASE}/spotify/status`, {
+  const res = await fetch(`${SPOTIFY_API_BASE}/status`, {
     credentials: "include",
   });
   if (!res.ok) return false;
@@ -32,7 +33,7 @@ export async function fetchSpotifyStatus(): Promise<boolean> {
  * Gets the track currently playing on the user's Spotify account.
  */
 export async function fetchNowPlaying(): Promise<SpotifyTrack | null> {
-  const res = await fetch(`${API_BASE}/spotify/now-playing`, {
+  const res = await fetch(`${SPOTIFY_API_BASE}/now-playing`, {
     credentials: "include",
   });
   
@@ -44,7 +45,7 @@ export async function fetchNowPlaying(): Promise<SpotifyTrack | null> {
 
 /** Play Spotify */
 export async function playSpotify() {
-  await fetch(`${API_BASE}/spotify/play`, {
+  await fetch(`${SPOTIFY_API_BASE}/play`, {
     method: "POST",
     credentials: "include",
   });
@@ -52,7 +53,7 @@ export async function playSpotify() {
 
 /** Pause Spotify */
 export async function pauseSpotify() {
-  await fetch(`${API_BASE}/spotify/pause`, {
+  await fetch(`${SPOTIFY_API_BASE}/pause`, {
     method: "POST",
     credentials: "include",
   });
@@ -60,7 +61,7 @@ export async function pauseSpotify() {
 
 /** Skip to Next Track */
 export async function skipNextSpotify() {
-  await fetch(`${API_BASE}/spotify/next`, {
+  await fetch(`${SPOTIFY_API_BASE}/next`, {
     method: "POST",
     credentials: "include",
   });
@@ -68,7 +69,7 @@ export async function skipNextSpotify() {
 
 /** Skip to Previous Track */
 export async function skipPrevSpotify() {
-  await fetch(`${API_BASE}/spotify/previous`, {
+  await fetch(`${SPOTIFY_API_BASE}/previous`, {
     method: "POST",
     credentials: "include",
   });

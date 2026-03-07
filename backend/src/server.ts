@@ -19,8 +19,8 @@ app.use(express.json());
 // Mount auth routes at /auth
 app.use("/auth", authRouter);
 
-// Mount spotify routes at /spotify
-app.use("/spotify", spotifyRouter);
+// Mount spotify routes at /auth/spotify
+app.use("/auth/spotify", spotifyRouter);
 
 app.get("/", (req, res) => {
   res.send("Coda Backend is running!");
