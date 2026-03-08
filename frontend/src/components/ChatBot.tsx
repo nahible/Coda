@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Send, Bot, User, Sparkles, HelpCircle } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import {
   sendChatMessage,
   type ChatMessage as ApiChatMessage,
@@ -231,7 +233,8 @@ export default function ChatBot() {
                 >
                   <ReactMarkdown
                     components={markdownComponents}
-                    remarkPlugins={[remarkGfm]}
+                    remarkPlugins={[remarkGfm, remarkMath]}
+                    rehypePlugins={[rehypeKatex]}
                   >
                     {message.text}
                   </ReactMarkdown>

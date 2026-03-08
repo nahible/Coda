@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
+  CalendarDays,
   LayoutDashboard,
   LogOut,
   Music,
@@ -17,6 +18,7 @@ const navItems = [
   { id: 'music', icon: Music, label: 'Music' },
   { id: 'timer', icon: Timer, label: 'Timer' },
   { id: 'tasks', icon: ListTodo, label: 'Tasks' },
+  { id: 'canvas', icon: CalendarDays, label: 'Canvas' },
   { id: 'chat', icon: MessageSquare, label: 'Chat' },
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
