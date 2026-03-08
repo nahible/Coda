@@ -69,13 +69,25 @@ export default function PomodoroTimer() {
       {/* Ring */}
       <div className="relative w-[130px] h-[130px] flex items-center justify-center flex-shrink-0">
         <svg className="rotate-[-90deg] w-[130px] h-[130px]" viewBox="0 0 120 120">
-          <circle className="ring-track" cx="60" cy="60" r="54" />
           <circle
-            className="ring-progress"
-            cx="60" cy="60" r="54"
+            cx="60"
+            cy="60"
+            r="54"
+            fill="none"
+            stroke="var(--color-ring-track)"
+            strokeWidth={5}
+          />
+          <circle
+            cx="60"
+            cy="60"
+            r="54"
+            fill="none"
             stroke={mode === 'work' ? 'var(--color-ring-work)' : 'var(--color-ring-break)'}
+            strokeWidth={5}
+            strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={dashOffset}
+            style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s ease' }}
           />
         </svg>
         <div className="absolute text-[1.7rem] font-bold tracking-wider text-ink">

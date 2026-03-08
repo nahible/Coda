@@ -31,7 +31,7 @@ export default function Sidebar({ onLogout, user }: SidebarProps) {
 
   return (
     <aside
-      className="sidebar-glass flex flex-col items-center self-center w-[68px] shrink-0 anim-in"
+      className="flex w-[68px] shrink-0 self-center flex-col items-center rounded-[24px] border border-border-soft bg-white/75 py-20 shadow-[0_1px_3px_rgba(100,80,140,0.02),0_4px_16px_rgba(100,80,140,0.04),0_12px_40px_rgba(100,80,140,0.06),inset_0_1.5px_0_rgba(255,255,255,0.5)] backdrop-blur-[12px] animate-[fadeInUp_0.5s_ease_forwards]"
       id="sidebar"
     >
       {/* Logo — inset from top */}

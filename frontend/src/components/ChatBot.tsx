@@ -1,72 +1,46 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, ListTodo, HelpCircle, PlusCircle, CheckCircle } from 'lucide-react';
-import type { Todo } from './TodoList';
+import { Send, Bot, User, Sparkles, HelpCircle } from 'lucide-react';
 
 interface Message { id: number; role: 'user' | 'bot'; text: string; }
-interface ChatBotProps { todos: Todo[]; setTodos: React.Dispatch<React.SetStateAction<Todo[]>>; }
 
 let msgId = 1;
-let todoIdCounter = 100;
 
-function botReply(text: string, todos: Todo[], setTodos: React.Dispatch<React.SetStateAction<Todo[]>>): string {
+function botReply(text: string): string {
   const lower = text.toLowerCase().trim();
 
-  if (lower.startsWith('add task ') || lower.startsWith('add todo ')) {
-    const taskText = text.slice(9).trim();
-    if (taskText) {
-      setTodos((prev) => [...prev, { id: todoIdCounter++, text: taskText, done: false }]);
-      return `✅ Added "${taskText}" to your task list!`;
-    }
-    return 'Please provide a task name after "add task".';
-  }
-
-  if (lower.includes('show tasks') || lower.includes('list tasks') || lower.includes('my tasks')) {
-    if (todos.length === 0) return '📋 Your task list is empty.';
-    const pending = todos.filter((t) => !t.done);
-    const done = todos.filter((t) => t.done);
-    let msg = `📋 **Your Tasks** (${pending.length} pending, ${done.length} done)\n\n`;
-    pending.forEach((t) => { msg += `• ${t.text}\n`; });
-    if (done.length > 0) { msg += `\n~~Completed:~~\n`; done.forEach((t) => { msg += `• ~~${t.text}~~\n`; }); }
-    return msg;
-  }
-
-  if (lower.startsWith('complete ') || lower.startsWith('done ') || lower.startsWith('finish ')) {
-    const keyword = lower.startsWith('complete ') ? 'complete ' : lower.startsWith('done ') ? 'done ' : 'finish ';
-    const taskName = text.slice(keyword.length).trim().toLowerCase();
-    let found = false;
-    setTodos((prev) => prev.map((t) => { if (t.text.toLowerCase().includes(taskName) && !t.done) { found = true; return { ...t, done: true }; } return t; }));
-    return found ? `✅ Marked as complete!` : `Couldn't find a pending task matching "${taskName}".`;
-  }
-
-  if (lower.startsWith('delete ') || lower.startsWith('remove ')) {
-    const keyword = lower.startsWith('delete ') ? 'delete ' : 'remove ';
-    const taskName = text.slice(keyword.length).trim().toLowerCase();
-    let found = false;
-    setTodos((prev) => prev.filter((t) => { if (t.text.toLowerCase().includes(taskName) && !found) { found = true; return false; } return true; }));
-    return found ? `🗑️ Removed the task!` : `Couldn't find a task matching "${taskName}".`;
+  if (
+    lower.startsWith('add task ') ||
+    lower.startsWith('add todo ') ||
+    lower.includes('show tasks') ||
+    lower.includes('list tasks') ||
+    lower.includes('my tasks') ||
+    lower.startsWith('complete ') ||
+    lower.startsWith('done ') ||
+    lower.startsWith('finish ') ||
+    lower.startsWith('delete ') ||
+    lower.startsWith('remove ')
+  ) {
+    return 'Task commands are disabled in the assistant for now. Use the Tasks panel to manage your saved todos.';
   }
 
   if (lower === 'help' || lower === '/help') {
-    return `🤖 **Commands:**\n\n• **add task [name]** — Add a new task\n• **show tasks** — List all tasks\n• **complete [name]** — Mark complete\n• **delete [name]** — Remove a task`;
+    return 'Use the Tasks panel to add, complete, or delete todos. The assistant can still answer general questions.';
   }
 
   const responses = [
-    "That's a great point! Let me know if you need help with your tasks. 😊",
-    "Interesting! Try typing **help** to see what I can do.",
-    "I'm here to help you stay productive! Need to manage tasks? Just ask.",
-    "Got it! I'm your productivity buddy — ask me anything. 💪",
+    'Interesting. Type **help** if you want a quick reminder of what is available here.',
+    'I can still chat here, but task edits now live in the Tasks panel.',
+    'Use the Tasks panel for todo changes, or ask me something else here.',
+    'I am here if you want to talk through an idea or ask a general question.',
   ];
   return responses[Math.floor(Math.random() * responses.length)];
 }
 
 const quickActions = [
-  { icon: PlusCircle, label: 'Add Task', command: 'add task ' },
-  { icon: ListTodo, label: 'My Tasks', command: 'show tasks' },
-  { icon: CheckCircle, label: 'Complete', command: 'complete ' },
   { icon: HelpCircle, label: 'Help', command: 'help' },
 ];
 
-export default function ChatBot({ todos, setTodos }: ChatBotProps) {
+export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
@@ -79,7 +53,7 @@ export default function ChatBot({ todos, setTodos }: ChatBotProps) {
     setMessages((prev) => [...prev, { id: msgId++, role: 'user', text: msg }]);
     if (!text) setInput('');
     setTimeout(() => {
-      const reply = botReply(msg, todos, setTodos);
+      const reply = botReply(msg);
       setMessages((prev) => [...prev, { id: msgId++, role: 'bot', text: reply }]);
     }, 400 + Math.random() * 400);
   }
@@ -137,7 +111,10 @@ export default function ChatBot({ todos, setTodos }: ChatBotProps) {
           </div>
         ) : (
           messages.map((msg) => (
-            <div key={msg.id} className={`flex gap-3 anim-in ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <div
+              key={msg.id}
+              className={`flex gap-3 animate-[fadeInUp_0.5s_ease_forwards] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+            >
               <div className={`w-8 h-8 rounded-[10px] flex items-center justify-center shrink-0 mt-0.5
                 ${msg.role === 'bot'
                   ? 'bg-gradient-to-br from-accent-strong to-accent-muted text-ink-on-accent'

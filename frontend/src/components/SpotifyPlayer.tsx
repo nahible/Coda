@@ -75,7 +75,7 @@ export default function SpotifyPlayer() {
           Now Playing
         </h3>
         <div className="flex items-center gap-1.5 text-[0.68rem] font-semibold text-green-dot px-3 py-1 rounded-full bg-[rgba(142,207,160,0.12)]">
-          <span className="w-[5px] h-[5px] bg-green-dot rounded-full anim-pulse" />
+          <span className="w-[5px] h-[5px] rounded-full bg-green-dot animate-[pulse_2s_ease_infinite]" />
           Spotify
         </div>
       </div>
