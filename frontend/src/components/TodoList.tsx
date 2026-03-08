@@ -16,11 +16,11 @@ interface TodoListProps {
 const TODO_BADGE = {
   completed: {
     label: 'Done',
-    className: 'bg-emerald-100 text-emerald-700',
+    className: 'bg-panel-alt text-green-dot',
   },
   pending: {
     label: 'Task',
-    className: 'bg-indigo-100 text-indigo-700',
+    className: 'bg-panel-alt text-accent-strong',
   },
 } as const;
 
@@ -109,9 +109,9 @@ export default function TodoList({
         </div>
       ) : null}
 
-      <div className="flex items-center gap-4 bg-white/40 px-5 py-4">
+      <div className="mb-4 flex items-center gap-4 px-1">
         <input
-          className="min-w-0 flex-1 appearance-none rounded-xl border border-border-med bg-panel-alt px-4 py-2 text-sm leading-relaxed text-ink outline-none transition focus:border-accent focus:bg-white/75 focus:ring-4 focus:ring-accent/10 placeholder:text-ink-faint"
+          className="min-w-0 flex-1 appearance-none rounded-xl border border-border-med bg-panel-inner px-4 py-3 text-sm leading-relaxed text-ink outline-none transition focus:border-accent focus:bg-panel focus:ring-4 focus:ring-accent/10 placeholder:text-ink-faint hover:bg-panel-alt"
           placeholder="Add a new task…"
           value={input}
           onChange={(event) => setInput(event.target.value)}
@@ -128,7 +128,7 @@ export default function TodoList({
         </button>
       </div>
 
-      <ul className="flex flex-1 flex-col gap-4 overflow-y-auto px-1">
+      <ul className="flex flex-1 flex-col gap-2 overflow-y-auto px-1">
         {isLoading ? (
           <li className="py-10 text-center text-sm text-ink-faint">
             Loading your tasks...
@@ -147,19 +147,17 @@ export default function TodoList({
             return (
               <li
                 key={todo.id}
-                className={`group flex items-center gap-3 rounded-xl bg-white/55 px-4 py-2 transition ${
-                  editingTodoId === todo.id
-                    ? 'border border-accent shadow-lg'
-                    : 'border border-transparent hover:border-border-soft hover:bg-white/65'
-                }`}
+                className={`group flex items-center gap-3 rounded-xl bg-panel-inner px-4 py-2 transition ${editingTodoId === todo.id
+                  ? 'border border-accent shadow-lg'
+                  : 'border border-transparent hover:border-border-soft hover:bg-panel-alt'
+                  }`}
               >
                 <button
                   type="button"
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 transition ${
-                    todo.completed
-                      ? 'border-check-bg bg-check-bg text-ink-on-accent'
-                      : 'border-ink-faint/40 hover:border-accent'
-                  }`}
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 transition ${todo.completed
+                    ? 'border-check-bg bg-check-bg text-ink-on-accent'
+                    : 'border-ink-faint/40 hover:border-accent'
+                    }`}
                   onClick={() => void onToggle(todo)}
                   role="checkbox"
                   aria-checked={todo.completed}
@@ -199,9 +197,8 @@ export default function TodoList({
                 ) : (
                   <button
                     type="button"
-                    className={`min-w-0 flex-1 wrap-anywhere whitespace-pre-wrap text-left text-base font-medium leading-relaxed transition ${
-                      todo.completed ? 'text-ink-faint line-through' : 'text-ink'
-                    }`}
+                    className={`min-w-0 flex-1 wrap-anywhere whitespace-pre-wrap text-left text-base font-medium leading-relaxed transition ${todo.completed ? 'text-ink-faint line-through' : 'text-ink'
+                      }`}
                     onClick={() => startEditing(todo)}
                     disabled={isMutating}
                     title="Click to edit"

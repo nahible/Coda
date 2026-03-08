@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { GridStack } from "gridstack";
+import { GridStack, type GridStackWidget } from "gridstack";
 import type { AuthUser } from "../api/auth";
 import {
   createTodoByUserId,
@@ -23,10 +23,17 @@ type HomePageProps = {
 const widgetShellClassName = [
   "grid-stack-item-content",
   "flex flex-col overflow-hidden rounded-[24px] border border-border-soft bg-panel p-6",
-  "shadow-[0_1px_3px_rgba(100,80,140,0.02),0_4px_16px_rgba(100,80,140,0.04),0_12px_40px_rgba(100,80,140,0.06),inset_0_1.5px_0_rgba(255,255,255,0.5)]",
-  "backdrop-blur-[10px] transition-[box-shadow] duration-300",
-  "hover:shadow-[0_1px_3px_rgba(100,80,140,0.03),0_6px_20px_rgba(100,80,140,0.06),0_16px_48px_rgba(100,80,140,0.08),inset_0_1.5px_0_rgba(255,255,255,0.6)]",
+  "shadow-panel",
+  "backdrop-blur-[10px] transition-all duration-300",
+  "hover:shadow-panel-hover",
 ].join(" ");
+
+const DEFAULT_LAYOUT: GridStackWidget[] = [
+  { id: "spotify-item", x: 0, y: 0, w: 4, h: 6, minW: 3, minH: 5 },
+  { id: "pomodoro-item", x: 0, y: 6, w: 4, h: 6, minW: 2, minH: 4 },
+  { id: "todo-item", x: 4, y: 8, w: 8, h: 4, minW: 3, minH: 4 },
+  { id: "chat-item", x: 4, y: 0, w: 8, h: 8, minW: 4, minH: 8 },
+];
 
 export default function HomePage({ onLogout, user }: HomePageProps) {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -46,13 +53,15 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           float: true,
           animate: true,
           resizable: {
-            handles: "se",
+            handles: "e, se, s, sw, w, nw, n, ne",
           },
         },
         gridRef.current,
       );
 
-      // Forcefully apply minimum size constraints that HTML attributes sometimes drop
+      // We no longer rely strictly on hardcoded dimensions here,
+      // GridStack will extract the minimums from our default array 
+      // or the data-gs-* attributes, but ensure constraints are applied:
       const spotifyEl = document.getElementById("spotify-item");
       if (spotifyEl && gridInstanceRef.current) {
         gridInstanceRef.current.update(spotifyEl, { minW: 3, minH: 4 });
@@ -71,6 +80,13 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
       }
     };
   }, []);
+
+  const handleResetLayout = () => {
+    if (gridInstanceRef.current) {
+      // GridStack automatically finds the elements by ID and re-places them
+      gridInstanceRef.current.load(DEFAULT_LAYOUT);
+    }
+  };
 
   useEffect(() => {
     let isActive = true;
@@ -206,7 +222,7 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
   return (
     <div className="flex h-screen p-6 gap-6" id="app-shell">
       {/* Sidebar — outside the grid */}
-      <Sidebar onLogout={onLogout} user={user} />
+      <Sidebar onLogout={onLogout} onResetLayout={handleResetLayout} user={user} />
 
       {/* Gridstack Bento Grid */}
       <main className="flex-1 min-h-0 overflow-y-auto">
@@ -214,6 +230,8 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           {/* Spotify Player */}
           <div
             className="grid-stack-item"
+            id="spotify-item"
+            gs-id="spotify-item"
             gs-x="0"
             gs-y="0"
             gs-w="4"
@@ -230,10 +248,11 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           <div
             className="grid-stack-item"
             id="pomodoro-item"
+            gs-id="pomodoro-item"
             gs-x="0"
             gs-y="6"
             gs-w="4"
-            gs-h="8"
+            gs-h="6"
             gs-min-w="2"
             gs-min-h="4"
           >
@@ -245,10 +264,12 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           {/* Todo List */}
           <div
             className="grid-stack-item"
-            gs-x="0"
-            gs-y="14"
-            gs-w="4"
-            gs-h="6"
+            id="todo-item"
+            gs-id="todo-item"
+            gs-x="4"
+            gs-y="8"
+            gs-w="8"
+            gs-h="4"
             gs-min-w="3"
             gs-min-h="4"
           >
@@ -269,10 +290,12 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           {/* ChatBot */}
           <div
             className="grid-stack-item"
+            id="chat-item"
+            gs-id="chat-item"
             gs-x="4"
             gs-y="0"
             gs-w="8"
-            gs-h="20"
+            gs-h="8"
             gs-min-w="4"
             gs-min-h="8"
           >
