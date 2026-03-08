@@ -71,10 +71,10 @@ export default function Settings({ onClose }: SettingsProps) {
       const isDark = document.documentElement.classList.contains('dark');
       const root = document.documentElement;
       root.style.setProperty('--theme-accent', customColor);
-      root.style.setProperty('--theme-accent-strong', hslToHex(h, s, isDark ? 45 : 55));
+      root.style.setProperty('--theme-accent-strong', customColor);
       root.style.setProperty('--theme-accent-muted', hslToHex(h, Math.max(s - 15, 10), isDark ? 22 : 88));
-      root.style.setProperty('--theme-check-bg', hslToHex(h, s, isDark ? 45 : 55));
-      root.style.setProperty('--theme-ring-work', hslToHex(h, s, isDark ? 45 : 55));
+      root.style.setProperty('--theme-check-bg', customColor);
+      root.style.setProperty('--theme-ring-work', customColor);
       root.style.setProperty('--theme-user-bubble', `hsla(${h}, ${s}%, ${isDark ? 35 : 75}%, ${isDark ? 0.3 : 0.7})`);
       root.style.setProperty('--theme-tag-bg', `hsla(${h}, ${s}%, ${isDark ? 35 : 75}%, 0.6)`);
     } else {
