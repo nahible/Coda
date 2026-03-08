@@ -1,10 +1,6 @@
 import { getGoogleAuthUrl } from "../api/auth";
 
-type LoginProps = {
-  errorMessage?: string | null;
-};
-
-const Login = ({ errorMessage }: LoginProps) => {
+const Login = () => {
   const handleGoogleLogin = () => {
     window.location.href = getGoogleAuthUrl();
   };
@@ -15,26 +11,17 @@ const Login = ({ errorMessage }: LoginProps) => {
       <div className="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg px-12 py-14 flex flex-col items-center gap-8 max-w-sm w-full mx-4">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3">
-          <div className="w-14 h-14 rounded-full bg-[#1a1a1a] flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-7 h-7"
-            >
-              <circle cx="12" cy="8" r="3" />
-              <circle cx="7" cy="16" r="2.5" />
-              <circle cx="17" cy="16" r="2.5" />
-            </svg>
-          </div>
+          <img
+            src="/coda-icon.svg"
+            alt="Coda logo"
+            className="h-16 w-16 rounded-2xl object-contain"
+          />
           <h1 className="text-3xl font-bold text-[#1a1a1a] tracking-tight">
             Coda
           </h1>
-          <p className="text-sm text-[#6b6b6b]">Your custom syllabus</p>
+          <p className="text-sm text-[#6b6b6b] text-center">
+            Finally, everything in one place. For real this time.
+          </p>
         </div>
 
         {/* Google Sign-In Button */}
@@ -63,9 +50,6 @@ const Login = ({ errorMessage }: LoginProps) => {
           </svg>
           Continue with Google
         </button>
-        {errorMessage ? (
-          <p className="text-center text-sm text-[#b24c58]">{errorMessage}</p>
-        ) : null}
       </div>
     </div>
   );
