@@ -227,6 +227,11 @@
   }
 }
 
+@keyframes spinCD {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ===== Gridstack Overrides ===== */
 @layer components {
   .grid-stack > .grid-stack-placeholder > .placeholder-content {

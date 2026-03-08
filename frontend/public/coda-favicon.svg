@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 24 24" fill="none">
+  <!-- Outer Oval -->
+  <ellipse cx="12" cy="12" rx="6" ry="8" stroke="#a899ca" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Vertical Line -->
+  <line x1="12" y1="4" x2="12" y2="20" stroke="#a899ca" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Horizontal Line -->
+  <line x1="6" y1="12" x2="18" y2="12" stroke="#a899ca" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

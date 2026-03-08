@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Palette, Timer, Upload, Check } from "lucide-react";
+import { User, Palette, Timer, Upload, Check, Disc, Disc3, Image } from "lucide-react";
 
 type SettingsProps = {
   // We will pass the user and options here later
@@ -65,6 +65,16 @@ export default function Settings({ onClose }: SettingsProps) {
     localStorage.setItem("coda_break_mins", breakTime.toString());
     window.dispatchEvent(new Event("coda_timer_updated"));
   }, [breakTime]);
+
+  // Album display mode
+  const [albumDisplayMode, setAlbumDisplayMode] = useState<"cover" | "cd" | "vinyl">(() => {
+    return (localStorage.getItem("coda_album_display") as "cover" | "cd" | "vinyl") || "cd";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("coda_album_display", albumDisplayMode);
+    window.dispatchEvent(new Event("coda_album_display_changed"));
+  }, [albumDisplayMode]);
 
   // Profile State
   const [profilePic, setProfilePic] = useState<string | null>(() => {
@@ -183,6 +193,35 @@ export default function Settings({ onClose }: SettingsProps) {
                     >
                        <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
                     </button>
+                 </div>
+              </section>
+
+              <div className="h-px bg-border-soft w-full my-6" />
+
+              <section>
+                 <h3 className="text-base font-semibold text-ink mb-4">Music Player Style</h3>
+                 <div className="grid grid-cols-3 gap-4">
+                   <button
+                     onClick={() => setAlbumDisplayMode("cover")}
+                     className={`flex flex-col items-center gap-3 p-5 rounded-[16px] border-2 transition-all cursor-pointer ${albumDisplayMode === 'cover' ? 'border-accent bg-panel shadow-sm' : 'border-border-soft bg-panel-alt hover:bg-panel'}`}
+                   >
+                     <Image size={28} className="text-ink-muted" />
+                     <span className="text-sm font-medium text-ink">Album Cover</span>
+                   </button>
+                   <button
+                     onClick={() => setAlbumDisplayMode("cd")}
+                     className={`flex flex-col items-center gap-3 p-5 rounded-[16px] border-2 transition-all cursor-pointer ${albumDisplayMode === 'cd' ? 'border-accent bg-panel shadow-sm' : 'border-border-soft bg-panel-alt hover:bg-panel'}`}
+                   >
+                     <Disc size={28} className="text-ink-muted" />
+                     <span className="text-sm font-medium text-ink">Spinning CD</span>
+                   </button>
+                   <button
+                     onClick={() => setAlbumDisplayMode("vinyl")}
+                     className={`flex flex-col items-center gap-3 p-5 rounded-[16px] border-2 transition-all cursor-pointer ${albumDisplayMode === 'vinyl' ? 'border-accent bg-panel shadow-sm' : 'border-border-soft bg-panel-alt hover:bg-panel'}`}
+                   >
+                     <Disc3 size={28} className="text-ink-muted" />
+                     <span className="text-sm font-medium text-ink">Vinyl</span>
+                   </button>
                  </div>
               </section>
             </div>
