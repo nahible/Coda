@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Palette, Timer, Upload, Check, Disc, Disc3, Image } from "lucide-react";
+import { User, Palette, Timer, Upload, Check, Disc, Disc3, Image, Pipette } from "lucide-react";
 
 type SettingsProps = {
   // We will pass the user and options here later
@@ -26,12 +26,69 @@ export default function Settings({ onClose }: SettingsProps) {
   const [activeTheme, setActiveTheme] = useState(() => {
     return localStorage.getItem("coda_theme") || "purple";
   });
+  const [customColor, setCustomColor] = useState(() => {
+    return localStorage.getItem("coda_custom_color") || "#c8bedc";
+  });
+
+  // Helper to derive lighter/darker shades from a hex color
+  function hexToHSL(hex: string) {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+    return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+  }
+
+  function hslToHex(h: number, s: number, l: number) {
+    const sl = s / 100, ll = l / 100;
+    const a = sl * Math.min(ll, 1 - ll);
+    const f = (n: number) => {
+      const k = (n + h / 30) % 12;
+      const c = ll - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * c).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
 
   // Apply Appearance instantly
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", activeTheme);
     localStorage.setItem("coda_theme", activeTheme);
-  }, [activeTheme]);
+
+    if (activeTheme === "custom") {
+      const { h, s } = hexToHSL(customColor);
+      const isDark = document.documentElement.classList.contains('dark');
+      const root = document.documentElement;
+      root.style.setProperty('--theme-accent', customColor);
+      root.style.setProperty('--theme-accent-strong', hslToHex(h, s, isDark ? 45 : 55));
+      root.style.setProperty('--theme-accent-muted', hslToHex(h, Math.max(s - 15, 10), isDark ? 22 : 88));
+      root.style.setProperty('--theme-check-bg', hslToHex(h, s, isDark ? 45 : 55));
+      root.style.setProperty('--theme-ring-work', hslToHex(h, s, isDark ? 45 : 55));
+      root.style.setProperty('--theme-user-bubble', `hsla(${h}, ${s}%, ${isDark ? 35 : 75}%, ${isDark ? 0.3 : 0.7})`);
+      root.style.setProperty('--theme-tag-bg', `hsla(${h}, ${s}%, ${isDark ? 35 : 75}%, 0.6)`);
+    } else {
+      // Clear any inline custom properties when using a preset theme
+      const root = document.documentElement;
+      root.style.removeProperty('--theme-accent');
+      root.style.removeProperty('--theme-accent-strong');
+      root.style.removeProperty('--theme-accent-muted');
+      root.style.removeProperty('--theme-check-bg');
+      root.style.removeProperty('--theme-ring-work');
+      root.style.removeProperty('--theme-user-bubble');
+      root.style.removeProperty('--theme-tag-bg');
+    }
+  }, [activeTheme, customColor, isDarkMode]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -174,6 +231,32 @@ export default function Settings({ onClose }: SettingsProps) {
                       <span className="text-sm font-medium text-ink-secondary">{theme.name}</span>
                     </button>
                   ))}
+                  {/* Custom Color Picker */}
+                  <button
+                    onClick={() => setActiveTheme("custom")}
+                    className={`flex flex-col items-center gap-3 p-4 rounded-[16px] border-2 transition-all ${activeTheme === 'custom' ? 'border-accent bg-panel' : 'border-transparent hover:bg-panel bg-panel/40'}`}
+                  >
+                    <label className="w-12 h-12 rounded-full shadow-inner ring-1 ring-black/5 flex items-center justify-center cursor-pointer relative overflow-hidden"
+                      style={{ background: `conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b)` }}
+                    >
+                      {activeTheme === 'custom' ? (
+                        <Check size={20} strokeWidth={3} className="text-white z-10" />
+                      ) : (
+                        <Pipette size={18} strokeWidth={2} className="text-white z-10" />
+                      )}
+                      <input
+                        type="color"
+                        value={customColor}
+                        onChange={(e) => {
+                          setCustomColor(e.target.value);
+                          localStorage.setItem("coda_custom_color", e.target.value);
+                          setActiveTheme("custom");
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
+                    </label>
+                    <span className="text-sm font-medium text-ink-secondary">Custom</span>
+                  </button>
                 </div>
               </section>
 
