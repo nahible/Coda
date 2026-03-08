@@ -156,7 +156,14 @@ export default function PomodoroTimer() {
           className="rotate-[-90deg] w-full h-full drop-shadow-sm"
           viewBox="0 0 120 120"
         >
-          <circle className="ring-track" cx="60" cy="60" r="54" />
+          <circle
+            cx="60"
+            cy="60"
+            r="54"
+            fill="none"
+            stroke="var(--color-ring-track)"
+            strokeWidth={5}
+          />
           <circle
             cx="60"
             cy="60"

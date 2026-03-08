@@ -237,7 +237,7 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
             gs-min-w="2"
             gs-min-h="4"
           >
-            <div className="grid-stack-item-content">
+            <div className={widgetShellClassName}>
               <PomodoroTimer />
             </div>
           </div>
