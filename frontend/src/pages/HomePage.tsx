@@ -29,10 +29,10 @@ const widgetShellClassName = [
 ].join(" ");
 
 const DEFAULT_LAYOUT: GridStackWidget[] = [
-  { id: "spotify-item", x: 0, y: 0, w: 4, h: 6, minW: 3, minH: 5 },
-  { id: "pomodoro-item", x: 0, y: 6, w: 4, h: 6, minW: 2, minH: 4 },
-  { id: "todo-item", x: 4, y: 8, w: 8, h: 4, minW: 3, minH: 4 },
-  { id: "chat-item", x: 4, y: 0, w: 8, h: 8, minW: 4, minH: 8 },
+  { id: "spotify-item", x: 0, y: 0, w: 4, h: 5, minW: 3, minH: 3 },
+  { id: "pomodoro-item", x: 0, y: 5, w: 4, h: 5, minW: 2, minH: 3 },
+  { id: "todo-item", x: 4, y: 0, w: 4, h: 10, minW: 3, minH: 4 },
+  { id: "chat-item", x: 8, y: 0, w: 4, h: 10, minW: 4, minH: 4 },
 ];
 
 export default function HomePage({ onLogout, user }: HomePageProps) {
@@ -235,9 +235,9 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
             gs-x="0"
             gs-y="0"
             gs-w="4"
-            gs-h="6"
+            gs-h="5"
             gs-min-w="3"
-            gs-min-h="5"
+            gs-min-h="3"
           >
             <div className={widgetShellClassName}>
               <SpotifyPlayer />
@@ -250,11 +250,11 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
             id="pomodoro-item"
             gs-id="pomodoro-item"
             gs-x="0"
-            gs-y="6"
+            gs-y="5"
             gs-w="4"
-            gs-h="6"
+            gs-h="5"
             gs-min-w="2"
-            gs-min-h="4"
+            gs-min-h="3"
           >
             <div className={widgetShellClassName}>
               <PomodoroTimer />
@@ -267,9 +267,9 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
             id="todo-item"
             gs-id="todo-item"
             gs-x="4"
-            gs-y="8"
-            gs-w="8"
-            gs-h="4"
+            gs-y="0"
+            gs-w="4"
+            gs-h="10"
             gs-min-w="3"
             gs-min-h="4"
           >
@@ -292,12 +292,12 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
             className="grid-stack-item"
             id="chat-item"
             gs-id="chat-item"
-            gs-x="4"
+            gs-x="8"
             gs-y="0"
-            gs-w="8"
-            gs-h="8"
+            gs-w="4"
+            gs-h="10"
             gs-min-w="4"
-            gs-min-h="8"
+            gs-min-h="4"
           >
             <div className={widgetShellClassName}>
               <ChatBot />
