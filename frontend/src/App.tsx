@@ -4,7 +4,6 @@ import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 
 export default function App() {
-  const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<AuthUser | null>(null);
 
@@ -26,7 +25,6 @@ export default function App() {
         }
 
         console.error(error);
-        setAuthError("Unable to verify your session right now.");
       } finally {
         if (isActive) {
           setIsLoading(false);
@@ -62,7 +60,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login errorMessage={authError} />;
+    return <Login />;
   }
 
   return <HomePage user={user} onLogout={handleLogout} />;
