@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Send, Bot, User, Sparkles, HelpCircle } from "lucide-react";
+import ReactMarkdown, { type Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   sendChatMessage,
   type ChatMessage as ApiChatMessage,
@@ -18,6 +20,65 @@ const quickActions = [
     command: "Give me a quick introduction to what you can help with here.",
   },
 ];
+
+const markdownComponents: Components = {
+  p({ children }) {
+    return <p className="mb-3 last:mb-0">{children}</p>;
+  },
+  ul({ children }) {
+    return (
+      <ul className="mb-3 list-disc space-y-1.5 pl-5 last:mb-0">{children}</ul>
+    );
+  },
+  ol({ children }) {
+    return (
+      <ol className="mb-3 list-decimal space-y-1.5 pl-5 last:mb-0">
+        {children}
+      </ol>
+    );
+  },
+  li({ children }) {
+    return <li className="pl-1">{children}</li>;
+  },
+  strong({ children }) {
+    return <strong className="font-semibold text-ink">{children}</strong>;
+  },
+  em({ children }) {
+    return <em className="italic">{children}</em>;
+  },
+  a({ href, children }) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="text-accent-strong underline decoration-accent/60 underline-offset-2"
+      >
+        {children}
+      </a>
+    );
+  },
+  pre({ children }) {
+    return (
+      <pre className="mb-3 overflow-x-auto rounded-2xl bg-black/10 px-4 py-3 text-[0.76rem] last:mb-0">
+        {children}
+      </pre>
+    );
+  },
+  code({ className, children }) {
+    const isBlockCode = className?.startsWith("language-");
+
+    if (isBlockCode) {
+      return <code className={className}>{children}</code>;
+    }
+
+    return (
+      <code className="rounded-md bg-black/10 px-1.5 py-0.5 font-mono text-[0.76rem] text-ink">
+        {children}
+      </code>
+    );
+  },
+};
 
 export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -162,23 +223,18 @@ export default function ChatBot() {
                   )}
                 </div>
                 <div
-                  className={`max-w-[78%] break-words whitespace-pre-wrap px-5 py-4 text-[0.82rem] leading-relaxed ${
+                  className={`max-w-[78%] break-words px-5 py-4 text-[0.82rem] leading-relaxed ${
                     message.role === "assistant"
                       ? "rounded-[18px] rounded-tl-[6px] border border-border-soft bg-bot-bubble text-ink"
                       : "rounded-[18px] rounded-tr-[6px] bg-user-bubble text-ink"
                   }`}
                 >
-                  {message.text.split(/(\*\*.*?\*\*)/g).map((part, index) =>
-                    part.startsWith("**") && part.endsWith("**") ? (
-                      <strong key={index} className="font-semibold">
-                        {part.slice(2, -2)}
-                      </strong>
-                    ) : part.startsWith("~~") && part.endsWith("~~") ? (
-                      <del key={index}>{part.slice(2, -2)}</del>
-                    ) : (
-                      <span key={index}>{part}</span>
-                    ),
-                  )}
+                  <ReactMarkdown
+                    components={markdownComponents}
+                    remarkPlugins={[remarkGfm]}
+                  >
+                    {message.text}
+                  </ReactMarkdown>
                 </div>
               </div>
             ))}
