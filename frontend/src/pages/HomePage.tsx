@@ -15,6 +15,7 @@ import PomodoroTimer from "../components/PomodoroTimer";
 import TodoList from "../components/TodoList";
 import ChatBot from "../components/ChatBot";
 import Settings from "../components/Settings";
+import CanvasCalendar from "../components/CanvasCalendar";
 
 type HomePageProps = {
   onLogout: () => void | Promise<void>;
@@ -263,6 +264,11 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
                   onDelete={handleDeleteTodo}
                   onUpdateText={handleUpdateTodoText}
                 />
+              </div>
+            )}
+            {activeTab === "canvas" && (
+              <div className="w-full min-h-full p-6 bg-panel rounded-[24px] border border-border-soft shadow-panel backdrop-blur-[10px] flex flex-col">
+                <CanvasCalendar />
               </div>
             )}
             {activeTab === "chat" && (

@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import authRouter from "./routes/auth.js";
 import chatbotRouter from "./routes/chatbot.js";
+import canvasRouter from "./routes/canvas.js";
 import todoRouter from "./routes/todo.js";
 import spotifyRouter from "./routes/spotify.js";
 import pomodoroRouter from "./routes/pomodoro.js";
@@ -22,6 +23,7 @@ app.use(express.json());
 // Mount auth routes at /auth
 app.use("/auth", authRouter);
 app.use("/chatbot", chatbotRouter);
+app.use("/canvas", canvasRouter);
 app.use("/todos", todoRouter);
 
 // Mount spotify routes at /auth/spotify
