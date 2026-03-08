@@ -4,16 +4,21 @@ import { fetchSessions, createSession } from "../api/pomodoro";
 
 const WORK_SECS = 5;
 const BREAK_SECS = 3;
+const WORK_MS = WORK_SECS * 1000;
+const BREAK_MS = BREAK_SECS * 1000;
 const CIRCUMFERENCE = 2 * Math.PI * 54;
 
 export default function PomodoroTimer() {
   const [mode, setMode] = useState<"work" | "break">("work");
-  const [remaining, setRemaining] = useState(WORK_SECS);
+  const [remainingMs, setRemainingMs] = useState(WORK_MS);
   const [running, setRunning] = useState(false);
   const [sessions, setSessions] = useState(0);
   const [isAlarmPlaying, setIsAlarmPlaying] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmRef = useRef<HTMLAudioElement | null>(null);
+  const endTimeRef = useRef<number | null>(null);
+  const remainingMsRef = useRef(WORK_MS);
+  const hasPlayedWarningRef = useRef(false);
 
   const stopAlarm = useCallback(() => {
     if (alarmRef.current) {
@@ -37,13 +42,18 @@ export default function PomodoroTimer() {
     [stopAlarm],
   );
 
-  const total = mode === "work" ? WORK_SECS : BREAK_SECS;
-  const pct = remaining / total;
+  useEffect(() => {
+    remainingMsRef.current = remainingMs;
+  }, [remainingMs]);
+
+  const total = mode === "work" ? WORK_MS : BREAK_MS;
+  const pct = remainingMs / total;
   const dashOffset = CIRCUMFERENCE * (1 - pct);
 
   const switchMode = useCallback((newMode: "work" | "break") => {
     setMode(newMode);
-    setRemaining(newMode === "work" ? WORK_SECS : BREAK_SECS);
+    setRemainingMs(newMode === "work" ? WORK_MS : BREAK_MS);
+    hasPlayedWarningRef.current = false;
     setRunning(false);
   }, []);
 
@@ -64,58 +74,99 @@ export default function PomodoroTimer() {
 
   useEffect(() => {
     if (running) {
+      endTimeRef.current = Date.now() + remainingMsRef.current;
+
+      const tick = () => {
+        if (!endTimeRef.current) {
+          return;
+        }
+
+        const nextRemainingMs = Math.max(0, endTimeRef.current - Date.now());
+
+        if (
+          mode === "work" &&
+          !hasPlayedWarningRef.current &&
+          nextRemainingMs <= 301000 &&
+          nextRemainingMs > 300000
+        ) {
+          hasPlayedWarningRef.current = true;
+          playAlarm(
+            "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
+            0.7,
+          );
+        }
+
+        setRemainingMs(nextRemainingMs);
+
+        if (nextRemainingMs > 0) {
+          return;
+        }
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+
+        endTimeRef.current = null;
+
+        if (mode === "work") {
+          setSessions((s) => s + 1);
+          createSession(WORK_SECS, "work").catch(console.error);
+          playAlarm("/break-over-alarm.wav", 0.8);
+          switchMode("break");
+        } else {
+          createSession(BREAK_SECS, "break").catch(console.error);
+          playAlarm("/break-over-alarm.wav", 0.8);
+          switchMode("work");
+        }
+      };
+
+      tick();
       intervalRef.current = setInterval(() => {
-        setRemaining((prev) => {
-          if (prev <= 1) {
-            if (mode === "work") {
-              setSessions((s) => s + 1);
-              createSession(WORK_SECS, "work").catch(console.error); // Save to DB
-              playAlarm("/break-over-alarm.wav", 0.8);
-              switchMode("break");
-            } else {
-              createSession(BREAK_SECS, "break").catch(console.error); // Save break too
-              playAlarm("/break-over-alarm.wav", 0.8);
-              switchMode("work");
-            }
-            return 0;
-          }
-          if (mode === "work" && prev === 301) {
-            // Trigger 5-minute warning chime
-            playAlarm(
-              "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
-              0.7,
-            );
-          }
-          return prev - 1;
-        });
-      }, 1000);
+        tick();
+      }, 100);
     } else if (intervalRef.current) {
       clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [running, mode, switchMode]);
+  }, [running, mode, playAlarm, switchMode]);
 
   function reset() {
     stopAlarm();
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    endTimeRef.current = null;
+    hasPlayedWarningRef.current = false;
 
     // If we're resetting a work session that actually had some progress, log it as interrupted
-    if (mode === "work" && remaining < WORK_SECS) {
-      createSession(WORK_SECS - remaining, "work", "interrupted").catch(
+    const remainingSecs = Math.ceil(remainingMsRef.current / 1000);
+    if (mode === "work" && remainingSecs < WORK_SECS) {
+      createSession(WORK_SECS - remainingSecs, "work", "interrupted").catch(
         console.error,
       );
     }
 
     setRunning(false);
-    setRemaining(mode === "work" ? WORK_SECS : BREAK_SECS);
+    setRemainingMs(mode === "work" ? WORK_MS : BREAK_MS);
   }
 
   const handleToggle = () => {
     stopAlarm();
-    setRunning(!running);
+    if (running && endTimeRef.current) {
+      setRemainingMs(Math.max(0, endTimeRef.current - Date.now()));
+      endTimeRef.current = null;
+    }
+    setRunning((prev) => !prev);
   };
+  const remaining = Math.max(0, Math.ceil(remainingMs / 1000));
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
 
@@ -132,7 +183,7 @@ export default function PomodoroTimer() {
         </h3>
         <div className="flex gap-1 bg-panel-inner rounded-full p-[3px]">
           <button
-            className={`text-[clamp(0.6rem,3cqmin,0.85rem)] font-medium px-[clamp(0.5rem,3cqw,1rem)] py-1 rounded-full transition-all duration-200 cursor-pointer
+            className={`text-[clamp(0.6rem,3cqmin,0.85rem)] font-medium px-[clamp(0.5rem,3cqw,1rem)] py-1 rounded-full transition-[background-color,color,box-shadow] duration-200 cursor-pointer
               ${mode === "work" ? "bg-accent-muted text-ink shadow-[0_1px_6px_rgba(120,100,160,0.1)]" : "text-ink-faint hover:text-ink-muted"}`}
             onClick={() => switchMode("work")}
             id="pomodoro-work-btn"
@@ -140,7 +191,7 @@ export default function PomodoroTimer() {
             Work
           </button>
           <button
-            className={`text-[clamp(0.6rem,3cqmin,0.85rem)] font-medium px-[clamp(0.5rem,3cqw,1rem)] py-1 rounded-full transition-all duration-200 cursor-pointer
+            className={`text-[clamp(0.6rem,3cqmin,0.85rem)] font-medium px-[clamp(0.5rem,3cqw,1rem)] py-1 rounded-full transition-[background-color,color,box-shadow] duration-200 cursor-pointer
               ${mode === "break" ? "bg-accent-muted text-ink shadow-[0_1px_6px_rgba(120,100,160,0.1)]" : "text-ink-faint hover:text-ink-muted"}`}
             onClick={() => switchMode("break")}
             id="pomodoro-break-btn"
@@ -179,7 +230,7 @@ export default function PomodoroTimer() {
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={dashOffset}
             style={{
-              transition: "stroke-dashoffset 1s linear, stroke 0.3s ease",
+              transition: "stroke-dashoffset 100ms linear, stroke 0.3s ease",
             }}
           />
         </svg>
@@ -192,7 +243,7 @@ export default function PomodoroTimer() {
       <div className="flex items-center justify-center gap-[clamp(1rem,5cqw,2.5rem)] h-[20cqh] max-h-16 min-h-12 mt-[clamp(1.5rem,10cqh,4rem)] w-full px-4">
         {isAlarmPlaying ? (
           <button
-            className="w-full h-full max-h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-bold uppercase tracking-widest shadow-lg shadow-rose-200/50 transition-all duration-200 transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer group"
+            className="group flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-rose-500 text-white shadow-lg shadow-rose-200/50 transition-[background-color,box-shadow,transform] duration-200 hover:bg-rose-600 active:scale-95"
             onClick={stopAlarm}
           >
             <BellOff size={18} className="group-hover:animate-shake" /> Stop
@@ -201,7 +252,7 @@ export default function PomodoroTimer() {
         ) : (
           <>
             <button
-              className="w-[clamp(32px,12cqmin,48px)] aspect-square flex items-center justify-center rounded-full text-ink-muted hover:text-ink hover:bg-panel-inner transition-all duration-200 cursor-pointer transform active:scale-95"
+              className="flex aspect-square w-[clamp(32px,12cqmin,48px)] items-center justify-center rounded-full text-ink-muted transition-[background-color,color,transform] duration-200 hover:bg-panel-inner hover:text-ink active:scale-95"
               onClick={reset}
               title="Reset"
               id="pomodoro-reset"
@@ -213,7 +264,7 @@ export default function PomodoroTimer() {
               />
             </button>
             <button
-              className="w-[clamp(38px,15cqmin,56px)] aspect-square flex items-center justify-center rounded-full bg-accent-strong text-ink-on-accent shadow-[0_3px_12px_rgba(120,100,160,0.18)] hover:shadow-[0_5px_18px_rgba(120,100,160,0.25)] transition-all duration-200 cursor-pointer transform active:scale-95 shrink-0"
+              className="flex aspect-square w-[clamp(38px,15cqmin,56px)] shrink-0 items-center justify-center rounded-full bg-accent-strong text-ink-on-accent shadow-[0_3px_12px_rgba(120,100,160,0.18)] transition-[box-shadow,transform] duration-200 hover:shadow-[0_5px_18px_rgba(120,100,160,0.25)] active:scale-95"
               onClick={handleToggle}
               title={running ? "Pause" : "Start"}
               id="pomodoro-play"

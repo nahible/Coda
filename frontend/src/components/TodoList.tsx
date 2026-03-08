@@ -147,10 +147,10 @@ export default function TodoList({
             return (
               <li
                 key={todo.id}
-                className={`group flex items-center gap-3 rounded-xl bg-white/40 px-4 py-2 transition ${
+                className={`group flex items-center gap-3 rounded-xl bg-white/55 px-4 py-2 transition ${
                   editingTodoId === todo.id
                     ? 'border border-accent shadow-lg'
-                    : 'border border-transparent hover:border-border-soft hover:bg-white/50'
+                    : 'border border-transparent hover:border-border-soft hover:bg-white/65'
                 }`}
               >
                 <button

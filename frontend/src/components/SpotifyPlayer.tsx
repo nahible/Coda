@@ -148,9 +148,7 @@ export default function SpotifyPlayer() {
           <Music size={26} strokeWidth={1.5} />
         </div>
         <div className="text-center">
-          <h3 className="font-semibold text-ink text-base">
-            Spotify Integration
-          </h3>
+          <h3 className="font-semibold text-ink text-base">Spotify</h3>
           <p className="text-ink-muted text-[0.8rem] mt-1 max-w-[200px]">
             Connect your account to control music directly from Coda.
           </p>
