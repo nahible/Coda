@@ -187,23 +187,21 @@ export default function SpotifyPlayer() {
           <h3 className="text-[0.78rem] font-semibold text-ink-muted uppercase tracking-widest drop-shadow-sm">
             Now Playing
           </h3>
-          <div className="flex items-center justify-center gap-3 px-8 py-3.5 shrink-0 rounded-full bg-[#1DB954]/10 border border-[#1DB954]/20 shadow-sm backdrop-blur-md">
-            {track && track.is_playing ? (
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1DB954] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1DB954]"></span>
-              </span>
-            ) : null}
-            <span className="text-[0.65rem] font-bold text-[#14833b] lowercase tracking-widest block leading-none shrink-0">
-              spotify
-            </span>
+          <div className="flex items-center justify-center p-[6px] rounded-full bg-[#1DB954]/10 border border-[#1DB954]/20 shadow-sm backdrop-blur-md">
+            <svg
+              viewBox="0 0 24 24"
+              className={`w-6 h-6 text-[#1DB954] ${track?.is_playing ? "animate-pulse drop-shadow-[0_0_8px_rgba(29,185,84,0.6)]" : ""}`}
+              fill="currentColor"
+            >
+              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+            </svg>
           </div>
         </div>
 
         {/* Track */}
         {track ? (
           <div
-            className={`flex-1 min-h-[0px] w-full flex items-center justify-start gap-[clamp(1.5rem,5cqw,2.5rem)] py-[clamp(1rem,4cqh,2.5rem)] overflow-hidden ${isShortLayout ? "pr-4" : ""}`}
+            className={`flex-1 min-h-[0px] w-full flex items-center justify-start gap-[clamp(1.5rem,5cqw,2.5rem)] py-[clamp(1rem,4cqh,2.5rem)] ${isShortLayout ? "pr-4" : ""}`}
           >
             {!isShortLayout &&
               (track.album_image_url ? (
@@ -227,7 +225,7 @@ export default function SpotifyPlayer() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 min-h-[0px] w-full flex items-center justify-start gap-[clamp(1.5rem,5cqw,2.5rem)] py-[clamp(1rem,4cqh,2.5rem)] overflow-hidden">
+          <div className="flex-1 min-h-[0px] w-full flex items-center justify-start gap-[clamp(1.5rem,5cqw,2.5rem)] py-[clamp(1rem,4cqh,2.5rem)]">
             {!isShortLayout && (
               <div className="h-full max-w-[40%] aspect-square rounded-[clamp(1rem,2.5cqmin,1.5rem)] bg-white/40 border border-white/40 backdrop-blur-md flex items-center justify-center text-ink-muted/60 shrink-0 shadow-inner">
                 <Music size={48} strokeWidth={1.4} />

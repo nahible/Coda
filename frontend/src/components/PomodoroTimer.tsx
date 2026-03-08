@@ -2,22 +2,20 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Pause, RotateCcw, BellOff } from "lucide-react";
 import { fetchSessions, createSession } from "../api/pomodoro";
 
-const WORK_SECS = 5;
-const BREAK_SECS = 3;
-const WORK_MS = WORK_SECS * 1000;
-const BREAK_MS = BREAK_SECS * 1000;
+const getWorkSecs = () => Math.max(1, Math.round(parseFloat(localStorage.getItem("coda_work_mins") || "25") * 60));
+const getBreakSecs = () => Math.max(1, Math.round(parseFloat(localStorage.getItem("coda_break_mins") || "5") * 60));
 const CIRCUMFERENCE = 2 * Math.PI * 54;
 
 export default function PomodoroTimer() {
   const [mode, setMode] = useState<"work" | "break">("work");
-  const [remainingMs, setRemainingMs] = useState(WORK_MS);
+  const [remainingMs, setRemainingMs] = useState(getWorkSecs() * 1000);
   const [running, setRunning] = useState(false);
   const [sessions, setSessions] = useState(0);
   const [isAlarmPlaying, setIsAlarmPlaying] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmRef = useRef<HTMLAudioElement | null>(null);
   const endTimeRef = useRef<number | null>(null);
-  const remainingMsRef = useRef(WORK_MS);
+  const remainingMsRef = useRef(getWorkSecs() * 1000);
   const hasPlayedWarningRef = useRef(false);
 
   const stopAlarm = useCallback(() => {
@@ -46,16 +44,27 @@ export default function PomodoroTimer() {
     remainingMsRef.current = remainingMs;
   }, [remainingMs]);
 
-  const total = mode === "work" ? WORK_MS : BREAK_MS;
+  const total = mode === "work" ? getWorkSecs() * 1000 : getBreakSecs() * 1000;
   const pct = remainingMs / total;
   const dashOffset = CIRCUMFERENCE * (1 - pct);
 
   const switchMode = useCallback((newMode: "work" | "break") => {
     setMode(newMode);
-    setRemainingMs(newMode === "work" ? WORK_MS : BREAK_MS);
+    setRemainingMs(newMode === "work" ? getWorkSecs() * 1000 : getBreakSecs() * 1000);
     hasPlayedWarningRef.current = false;
     setRunning(false);
   }, []);
+
+  // Sync with Settings immediately
+  useEffect(() => {
+    const handleSettingsUpdate = () => {
+      if (!running) {
+        setRemainingMs(mode === "work" ? getWorkSecs() * 1000 : getBreakSecs() * 1000);
+      }
+    };
+    window.addEventListener("coda_timer_updated", handleSettingsUpdate);
+    return () => window.removeEventListener("coda_timer_updated", handleSettingsUpdate);
+  }, [mode, running]);
 
   // Fetch today's work sessions on mount
   useEffect(() => {
@@ -111,11 +120,11 @@ export default function PomodoroTimer() {
 
         if (mode === "work") {
           setSessions((s) => s + 1);
-          createSession(WORK_SECS, "work").catch(console.error);
+          createSession(getWorkSecs(), "work").catch(console.error);
           playAlarm("/break-over-alarm.wav", 0.8);
           switchMode("break");
         } else {
-          createSession(BREAK_SECS, "break").catch(console.error);
+          createSession(getBreakSecs(), "break").catch(console.error);
           playAlarm("/break-over-alarm.wav", 0.8);
           switchMode("work");
         }
@@ -147,15 +156,16 @@ export default function PomodoroTimer() {
     hasPlayedWarningRef.current = false;
 
     // If we're resetting a work session that actually had some progress, log it as interrupted
+    const workSecs = getWorkSecs();
     const remainingSecs = Math.ceil(remainingMsRef.current / 1000);
-    if (mode === "work" && remainingSecs < WORK_SECS) {
-      createSession(WORK_SECS - remainingSecs, "work", "interrupted").catch(
+    if (mode === "work" && remainingSecs < workSecs) {
+      createSession(workSecs - remainingSecs, "work", "interrupted").catch(
         console.error,
       );
     }
 
     setRunning(false);
-    setRemainingMs(mode === "work" ? WORK_MS : BREAK_MS);
+    setRemainingMs(mode === "work" ? workSecs * 1000 : getBreakSecs() * 1000);
   }
 
   const handleToggle = () => {

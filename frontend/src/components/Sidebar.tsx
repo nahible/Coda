@@ -22,14 +22,32 @@ const navItems = [
 ];
 
 type SidebarProps = {
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
   onLogout: () => void | Promise<void>;
   onResetLayout?: () => void;
   user: AuthUser;
 };
 
-export default function Sidebar({ onLogout, onResetLayout, user }: SidebarProps) {
-  const [active, setActive] = useState('dashboard');
+export default function Sidebar({
+  activeTab,
+  onTabChange,
+  onLogout,
+  onResetLayout,
+  user,
+}: SidebarProps) {
   const [isDark, setIsDark] = useState(false);
+  const [profilePic, setProfilePic] = useState<string | null>(() => {
+    return localStorage.getItem("coda_profile_pic");
+  });
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      setProfilePic(localStorage.getItem("coda_profile_pic"));
+    };
+    window.addEventListener("coda_profile_updated", handleProfileUpdate);
+    return () => window.removeEventListener("coda_profile_updated", handleProfileUpdate);
+  }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -94,12 +112,13 @@ export default function Sidebar({ onLogout, onResetLayout, user }: SidebarProps)
             key={item.id}
             id={`sidebar-${item.id}`}
             className={`w-11 h-11 flex items-center justify-center rounded-[14px] transition-all duration-200 cursor-pointer
-              ${active === item.id
-                ? 'bg-accent-muted text-ink shadow-[0_2px_8px_rgba(120,100,160,0.12)]'
-                : 'text-ink-muted hover:bg-panel-inner hover:text-ink-secondary'
+              ${
+                activeTab === item.id
+                  ? "bg-accent-muted text-ink shadow-[0_2px_8px_rgba(120,100,160,0.12)]"
+                  : "text-ink-muted hover:bg-panel-inner hover:text-ink-secondary"
               }`}
             onClick={() => {
-              setActive(item.id);
+              onTabChange(item.id);
               if (item.id === 'dashboard' && onResetLayout) {
                 onResetLayout();
               }
@@ -129,12 +148,21 @@ export default function Sidebar({ onLogout, onResetLayout, user }: SidebarProps)
         >
           <LogOut size={19} strokeWidth={1.4} />
         </button>
-        <div
-          className="w-9 h-9 rounded-full bg-gradient-to-br from-accent-strong to-accent-muted flex items-center justify-center text-ink-on-accent font-semibold text-[0.75rem]"
-          title={user.email}
-        >
-          {userInitial}
-        </div>
+        {profilePic ? (
+          <div 
+            className="w-9 h-9 rounded-full bg-panel-alt overflow-hidden border border-border-soft shadow-sm shrink-0"
+            title={user.email}
+          >
+            <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div
+            className="w-9 h-9 rounded-full bg-gradient-to-br from-accent-strong to-accent-muted flex items-center justify-center text-ink-on-accent font-semibold text-[0.75rem]"
+            title={user.email}
+          >
+            {userInitial}
+          </div>
+        )}
       </div>
     </aside>
   );

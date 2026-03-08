@@ -14,6 +14,7 @@ import SpotifyPlayer from "../components/SpotifyPlayer";
 import PomodoroTimer from "../components/PomodoroTimer";
 import TodoList from "../components/TodoList";
 import ChatBot from "../components/ChatBot";
+import Settings from "../components/Settings";
 
 type HomePageProps = {
   onLogout: () => void | Promise<void>;
@@ -36,6 +37,7 @@ const DEFAULT_LAYOUT: GridStackWidget[] = [
 ];
 
 export default function HomePage({ onLogout, user }: HomePageProps) {
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [todos, setTodos] = useState<Todo[]>([]);
   const [isTodosLoading, setIsTodosLoading] = useState(true);
   const [isTodoMutating, setIsTodoMutating] = useState(false);
@@ -222,11 +224,68 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
   return (
     <div className="flex h-screen p-6 gap-6" id="app-shell">
       {/* Sidebar — outside the grid */}
-      <Sidebar onLogout={onLogout} onResetLayout={handleResetLayout} user={user} />
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onLogout={onLogout}
+        onResetLayout={handleResetLayout}
+        user={user}
+      />
 
-      {/* Gridstack Bento Grid */}
+      {/* Main Content Area */}
       <main className="flex-1 min-h-0 overflow-y-auto">
-        <div className="grid-stack min-h-full" ref={gridRef}>
+        {/* Full-Screen Views */}
+        {activeTab !== "dashboard" && (
+          <div className="w-full h-full animate-[fadeInUp_0.5s_ease_forwards]">
+            {activeTab === "music" && (
+              <div className="w-full h-full flex items-center justify-center p-8 bg-panel rounded-[24px] border border-border-soft shadow-panel backdrop-blur-[10px]">
+                <div className="w-full max-w-2xl aspect-square md:aspect-video">
+                  <SpotifyPlayer />
+                </div>
+              </div>
+            )}
+            {activeTab === "timer" && (
+              <div className="w-full h-full flex items-center justify-center p-8 bg-panel rounded-[24px] border border-border-soft shadow-panel backdrop-blur-[10px]">
+                <div className="w-full max-w-2xl aspect-square md:aspect-video">
+                  <PomodoroTimer />
+                </div>
+              </div>
+            )}
+            {activeTab === "tasks" && (
+              <div className="w-full h-full p-8 bg-panel rounded-[24px] border border-border-soft shadow-panel backdrop-blur-[10px]">
+                <TodoList
+                  todos={todos}
+                  isLoading={isTodosLoading}
+                  isMutating={isTodoMutating}
+                  errorMessage={todosError}
+                  onCreate={handleCreateTodo}
+                  onToggle={handleToggleTodo}
+                  onDelete={handleDeleteTodo}
+                  onUpdateText={handleUpdateTodoText}
+                />
+              </div>
+            )}
+            {activeTab === "chat" && (
+               <div className="w-full h-full p-8 bg-panel rounded-[24px] border border-border-soft shadow-panel backdrop-blur-[10px] overflow-hidden flex flex-col">
+                <ChatBot />
+              </div>
+            )}
+            {activeTab === "settings" && (
+               <div className="w-full h-full bg-panel rounded-[24px] border border-border-soft shadow-panel backdrop-blur-[10px] overflow-hidden flex flex-col p-8">
+                <Settings onClose={() => setActiveTab("dashboard")} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Gridstack Bento Grid */}
+        <div
+          ref={gridRef}
+          className={`grid-stack min-h-full transition-opacity duration-300 ${
+            activeTab === "dashboard" ? "opacity-100 visible" : "opacity-0 invisible hidden"
+          }`}
+          id="dashboard-grid"
+        >
           {/* Spotify Player */}
           <div
             className="grid-stack-item"
