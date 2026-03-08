@@ -97,26 +97,11 @@ export default function Sidebar({
       id="sidebar"
     >
       {/* Logo — inset from top */}
-      <div
-        className="w-10 h-10 flex items-center justify-center bg-accent-strong rounded-[14px] text-ink-on-accent shadow-[0_2px_10px_rgba(120,100,160,0.18)]"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          {/* The Outer Oval (Thick) */}
-          <ellipse cx="12" cy="12" rx="6" ry="8" strokeWidth="2.5" />
-          {/* Vertical and Horizontal lines (Thin) */}
-          <line x1="12" y1="2" x2="12" y2="22" strokeWidth="1.5" />
-          <line x1="4" y1="12" x2="20" y2="12" strokeWidth="1.5" />
-        </svg>
-      </div>
+      <img
+        src="/coda-icon.svg"
+        alt="Coda"
+        className="h-10 w-10 rounded-[14px] shadow-[0_2px_10px_rgba(120,100,160,0.18)]"
+      />
 
       {/* Spacer */}
       <div className="h-[40px]" />

@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:5001";
 const SPOTIFY_API_BASE = `${API_BASE}/auth/spotify`;
 
 export interface SpotifyTrack {
