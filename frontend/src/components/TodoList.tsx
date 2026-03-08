@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Plus, Check, ClipboardList, Trash2 } from 'lucide-react';
-import type { Todo } from '../api/todos';
+import { useState } from "react";
+import { Plus, Check, ClipboardList, Trash2 } from "lucide-react";
+import type { Todo } from "../api/todos";
 
 interface TodoListProps {
   errorMessage: string | null;
@@ -13,17 +13,6 @@ interface TodoListProps {
   todos: Todo[];
 }
 
-const TODO_BADGE = {
-  completed: {
-    label: 'Done',
-    className: 'bg-panel-alt text-green-dot',
-  },
-  pending: {
-    label: 'Task',
-    className: 'bg-panel-alt text-accent-strong',
-  },
-} as const;
-
 export default function TodoList({
   todos,
   isLoading,
@@ -34,9 +23,9 @@ export default function TodoList({
   onDelete,
   onUpdateText,
 }: TodoListProps) {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
-  const [editingText, setEditingText] = useState('');
+  const [editingText, setEditingText] = useState("");
 
   async function addTodo() {
     const text = input.trim();
@@ -45,7 +34,7 @@ export default function TodoList({
     const wasCreated = await onCreate(text);
 
     if (wasCreated) {
-      setInput('');
+      setInput("");
     }
   }
 
@@ -60,11 +49,11 @@ export default function TodoList({
 
   function cancelEditing() {
     setEditingTodoId(null);
-    setEditingText('');
+    setEditingText("");
   }
 
   function autoResizeTextarea(element: HTMLTextAreaElement) {
-    element.style.height = '0px';
+    element.style.height = "0px";
     element.style.height = `${element.scrollHeight}px`;
   }
 
@@ -89,9 +78,6 @@ export default function TodoList({
 
   const pending = todos.filter((todo) => !todo.completed).length;
 
-  const getTodoBadge = (todo: Todo) =>
-    todo.completed ? TODO_BADGE.completed : TODO_BADGE.pending;
-
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="mb-2 flex items-center justify-between">
@@ -115,7 +101,7 @@ export default function TodoList({
           placeholder="Add a new task…"
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          onKeyDown={(event) => event.key === 'Enter' && addTodo()}
+          onKeyDown={(event) => event.key === "Enter" && addTodo()}
           disabled={isLoading || isMutating}
         />
         <button
@@ -142,22 +128,22 @@ export default function TodoList({
           </li>
         ) : (
           todos.map((todo) => {
-            const badge = getTodoBadge(todo);
-
             return (
               <li
                 key={todo.id}
-                className={`group flex items-center gap-3 rounded-xl bg-panel-inner px-4 py-2 transition ${editingTodoId === todo.id
-                  ? 'border border-accent shadow-lg'
-                  : 'border border-transparent hover:border-border-soft hover:bg-panel-alt'
-                  }`}
+                className={`group flex items-center gap-3 rounded-xl bg-panel-inner px-4 py-2 transition ${
+                  editingTodoId === todo.id
+                    ? "border border-accent shadow-lg"
+                    : "border border-transparent hover:border-border-soft hover:bg-panel-alt"
+                }`}
               >
                 <button
                   type="button"
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 transition ${todo.completed
-                    ? 'border-check-bg bg-check-bg text-ink-on-accent'
-                    : 'border-ink-faint/40 hover:border-accent'
-                    }`}
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 transition ${
+                    todo.completed
+                      ? "border-check-bg bg-check-bg text-ink-on-accent"
+                      : "border-ink-faint/40 hover:border-accent"
+                  }`}
                   onClick={() => void onToggle(todo)}
                   role="checkbox"
                   aria-checked={todo.completed}
@@ -176,12 +162,12 @@ export default function TodoList({
                     }}
                     onBlur={() => void saveEditedTodo(todo)}
                     onKeyDown={(event) => {
-                      if (event.key === 'Enter' && !event.shiftKey) {
+                      if (event.key === "Enter" && !event.shiftKey) {
                         event.preventDefault();
                         void saveEditedTodo(todo);
                       }
 
-                      if (event.key === 'Escape') {
+                      if (event.key === "Escape") {
                         event.preventDefault();
                         cancelEditing();
                       }
@@ -197,8 +183,11 @@ export default function TodoList({
                 ) : (
                   <button
                     type="button"
-                    className={`min-w-0 flex-1 wrap-anywhere whitespace-pre-wrap text-left text-base font-medium leading-relaxed transition ${todo.completed ? 'text-ink-faint line-through' : 'text-ink'
-                      }`}
+                    className={`min-w-0 flex-1 wrap-anywhere whitespace-pre-wrap text-left text-base font-medium leading-relaxed transition ${
+                      todo.completed
+                        ? "text-ink-faint line-through"
+                        : "text-ink"
+                    }`}
                     onClick={() => startEditing(todo)}
                     disabled={isMutating}
                     title="Click to edit"
@@ -207,19 +196,12 @@ export default function TodoList({
                   </button>
                 )}
 
-                {editingTodoId === todo.id ? null : (
-                  <span className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${badge.className}`}>
-                    {badge.label}
-                  </span>
-                )}
-
                 <button
                   className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted transition hover:bg-danger/10 hover:text-danger disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink-muted"
                   onClick={() => {
                     if (editingTodoId === todo.id) {
                       cancelEditing();
                     }
-
                     void onDelete(todo.id);
                   }}
                   title="Delete"
