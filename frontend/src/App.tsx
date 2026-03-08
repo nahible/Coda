@@ -53,8 +53,8 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#c9bfd6] text-[#1a1a1a]">
-        <div className="rounded-3xl bg-white/70 px-8 py-6 shadow-lg backdrop-blur-lg">
+      <div className="min-h-screen flex items-center justify-center bg-base text-ink">
+        <div className="rounded-3xl bg-panel px-8 py-6 shadow-panel backdrop-blur-lg">
           Checking your session...
         </div>
       </div>

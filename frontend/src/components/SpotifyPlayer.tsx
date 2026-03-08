@@ -178,7 +178,7 @@ export default function SpotifyPlayer() {
 
       <div
         ref={containerRef}
-        className="relative z-10 flex flex-col justify-center gap-3 h-full overflow-hidden @container"
+        className="relative z-10 flex flex-col justify-center gap-3 h-full @container"
         id="spotify-player"
         style={{ containerType: "size" }}
       >
@@ -240,7 +240,7 @@ export default function SpotifyPlayer() {
         )}
 
         {/* Progress */}
-        <div className="flex flex-col gap-2 flex-shrink-0 max-h-min mb-[-0.25rem] mt-1 relative z-20">
+        <div className="flex flex-col gap-2 flex-shrink-0 max-h-min mt-1 relative z-20">
           <div className="w-full h-[6px] bg-black/5 rounded-full overflow-hidden shadow-inner border border-white/20 backdrop-blur-sm">
             <div
               className={`h-full rounded-full transition-[width] duration-1000 ease-linear relative overflow-hidden ${!albumColor ? "bg-gradient-to-r from-accent-strong to-accent" : ""}`}
@@ -259,7 +259,7 @@ export default function SpotifyPlayer() {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-7 flex-shrink-0 relative z-20">
+        <div className="flex items-center justify-center gap-7 flex-shrink-0 relative z-20 pb-2">
           <button
             className="w-[clamp(32px,10cqh,40px)] h-[clamp(32px,10cqh,40px)] flex items-center justify-center rounded-full hover:bg-white/40 hover:shadow-sm border border-transparent hover:border-white/40 backdrop-blur-sm transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transform active:scale-95"
             onClick={handleSkipPrev}
