@@ -45,6 +45,11 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
       if (spotifyEl && gridInstanceRef.current) {
         gridInstanceRef.current.update(spotifyEl, { minW: 3, minH: 4 });
       }
+
+      const pomodoroEl = document.getElementById('pomodoro-item');
+      if (pomodoroEl && gridInstanceRef.current) {
+        gridInstanceRef.current.update(pomodoroEl, { minW: 2, minH: 4 });
+      }
     }
 
     return () => {
@@ -71,7 +76,7 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           </div>
 
           {/* Pomodoro Timer */}
-          <div className="grid-stack-item" gs-x="0" gs-y="6" gs-w="4" gs-h="8" gs-min-w="3" gs-min-h="6">
+          <div className="grid-stack-item" id="pomodoro-item" gs-x="0" gs-y="6" gs-w="4" gs-h="8" gs-min-w="2" gs-min-h="4">
             <div className="grid-stack-item-content">
               <PomodoroTimer />
             </div>
