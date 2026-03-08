@@ -36,7 +36,9 @@ export default function Sidebar({
   onResetLayout,
   user,
 }: SidebarProps) {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem("coda_dark_mode") === "true";
+  });
   const [profilePic, setProfilePic] = useState<string | null>(() => {
     return localStorage.getItem("coda_profile_pic");
   });
@@ -49,28 +51,42 @@ export default function Sidebar({
     return () => window.removeEventListener("coda_profile_updated", handleProfileUpdate);
   }, []);
 
+  // Sync dark mode from Settings changes
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    const syncDark = () => {
+      const dark = localStorage.getItem("coda_dark_mode") === "true";
+      setIsDark(dark);
+    };
+    window.addEventListener("storage", syncDark);
+    // Also listen for in-tab changes from Settings
+    const handleSettingsDark = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+    window.addEventListener("coda_dark_mode_changed", handleSettingsDark);
+    return () => {
+      window.removeEventListener("storage", syncDark);
+      window.removeEventListener("coda_dark_mode_changed", handleSettingsDark);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isDark) {
       document.documentElement.classList.add('dark');
-      setIsDark(true);
     } else {
       document.documentElement.classList.remove('dark');
-      setIsDark(false);
     }
-  }, []);
+  }, [isDark]);
 
   const toggleTheme = () => {
     const nextDark = !isDark;
     setIsDark(nextDark);
+    localStorage.setItem("coda_dark_mode", String(nextDark));
     if (nextDark) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
     }
+    window.dispatchEvent(new Event("coda_dark_mode_changed"));
   };
 
   const userInitial = user.name.trim().charAt(0).toUpperCase() || 'C';

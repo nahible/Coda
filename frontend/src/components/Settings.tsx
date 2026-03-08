@@ -11,8 +11,8 @@ const COLOR_THEMES = [
   { id: "pink", name: "Pastel Pink", hex: "#ffb3ba" },
   { id: "purple", name: "Purple", hex: "#c8bedc" },
   { id: "blue", name: "Pastel Blue", hex: "#bae1ff" },
-  { id: "yellow", name: "Butter Yellow", hex: "#ffeb99" },
-  { id: "orange", name: "Pastel Orange", hex: "#ffdfba" },
+  { id: "yellow", name: "Butter Yellow", hex: "#f5e6a3" },
+  { id: "orange", name: "Pastel Orange", hex: "#fad6a5" },
   { id: "bw", name: "Black & White", hex: "#e0e0e0" },
 ];
 
@@ -40,6 +40,7 @@ export default function Settings({ onClose }: SettingsProps) {
       document.documentElement.classList.remove("dark");
     }
     localStorage.setItem("coda_dark_mode", String(isDarkMode));
+    window.dispatchEvent(new Event("coda_dark_mode_changed"));
   }, [isDarkMode]);
   
   // Timer State
