@@ -73,15 +73,14 @@ export default function Sidebar({ onLogout, onResetLayout, user }: SidebarProps)
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          {/* Vertical and Horizontal registration marks */}
-          <line x1="12" y1="2" x2="12" y2="22" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          {/* The Outer Circle */}
-          <circle cx="12" cy="12" r="6" />
+          {/* The Outer Oval (Thick) */}
+          <ellipse cx="12" cy="12" rx="6" ry="8" strokeWidth="2.5" />
+          {/* Vertical and Horizontal lines (Thin) */}
+          <line x1="12" y1="2" x2="12" y2="22" strokeWidth="1.5" />
+          <line x1="4" y1="12" x2="20" y2="12" strokeWidth="1.5" />
         </svg>
       </div>
 
