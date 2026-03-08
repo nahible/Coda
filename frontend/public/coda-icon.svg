@@ -1,6 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
-  <rect x="4" y="4" width="40" height="40" rx="14" fill="#E5B2CB" />
-  <ellipse cx="24" cy="24" rx="6" ry="8" stroke="#FFFFFF" stroke-width="2.5" />
-  <line x1="24" y1="14" x2="24" y2="34" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
-  <line x1="16" y1="24" x2="32" y2="24" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 24 24" fill="none">
+  <!-- Rounded square background -->
+  <rect width="24" height="24" rx="6" fill="#a899ca"/>
+  <!-- Outer Oval -->
+  <ellipse cx="12" cy="12" rx="6" ry="8" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Vertical Line -->
+  <line x1="12" y1="4" x2="12" y2="20" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Horizontal Line -->
+  <line x1="6" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
 </svg>
