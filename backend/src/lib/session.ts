@@ -5,7 +5,8 @@ import type { Request, Response } from "express";
 const SESSION_COOKIE_NAME = "coda_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 const sessionSecret = process.env.SESSION_SECRET;
-const isProduction = process.env.NODE_ENV === "production";
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+const useCrossSiteCookie = frontendUrl.startsWith("https://");
 
 if (!sessionSecret) {
   throw new Error("Missing SESSION_SECRET in backend environment.");
@@ -53,8 +54,8 @@ const createSessionToken = (userId: number) => {
 export const setSessionCookie = (res: Response, userId: number) => {
   res.cookie(SESSION_COOKIE_NAME, createSessionToken(userId), {
     httpOnly: true,
-    sameSite: "lax",
-    secure: isProduction,
+    sameSite: useCrossSiteCookie ? "none" : "lax",
+    secure: useCrossSiteCookie,
     path: "/",
     maxAge: SESSION_TTL_MS,
   });
@@ -63,8 +64,8 @@ export const setSessionCookie = (res: Response, userId: number) => {
 export const clearSessionCookie = (res: Response) => {
   res.clearCookie(SESSION_COOKIE_NAME, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: isProduction,
+    sameSite: useCrossSiteCookie ? "none" : "lax",
+    secure: useCrossSiteCookie,
     path: "/",
   });
 };
