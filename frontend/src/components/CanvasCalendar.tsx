@@ -67,6 +67,7 @@ export default function CanvasCalendar() {
       setEvents(nextEvents);
       setErrorMessage(null);
       setSuccessMessage(`Loaded ${nextEvents.length} Canvas event${nextEvents.length === 1 ? "" : "s"}.`);
+      window.dispatchEvent(new Event("coda_canvas_updated"));
     } catch (error) {
       setErrorMessage(
         error instanceof Error

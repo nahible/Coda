@@ -16,6 +16,7 @@ import TodoList from "../components/TodoList";
 import ChatBot from "../components/ChatBot";
 import Settings from "../components/Settings";
 import CanvasCalendar from "../components/CanvasCalendar";
+import CanvasWidget from "../components/CanvasWidget";
 
 type HomePageProps = {
   onLogout: () => void | Promise<void>;
@@ -33,7 +34,8 @@ const widgetShellClassName = [
 const DEFAULT_LAYOUT: GridStackWidget[] = [
   { id: "spotify-item", x: 0, y: 0, w: 4, h: 5, minW: 3, minH: 3 },
   { id: "pomodoro-item", x: 0, y: 5, w: 4, h: 5, minW: 2, minH: 3 },
-  { id: "todo-item", x: 4, y: 0, w: 4, h: 10, minW: 3, minH: 4 },
+  { id: "todo-item", x: 4, y: 0, w: 4, h: 5, minW: 3, minH: 4 },
+  { id: "canvas-item", x: 4, y: 5, w: 4, h: 5, minW: 4, minH: 3 },
   { id: "chat-item", x: 8, y: 0, w: 4, h: 10, minW: 4, minH: 4 },
 ];
 
@@ -334,7 +336,7 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
             gs-x="4"
             gs-y="0"
             gs-w="4"
-            gs-h="10"
+            gs-h="5"
             gs-min-w="3"
             gs-min-h="4"
           >
@@ -349,6 +351,23 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
                 onDelete={handleDeleteTodo}
                 onUpdateText={handleUpdateTodoText}
               />
+            </div>
+          </div>
+
+          {/* ChatBot */}
+          <div
+            className="grid-stack-item"
+            id="canvas-item"
+            gs-id="canvas-item"
+            gs-x="4"
+            gs-y="5"
+            gs-w="4"
+            gs-h="5"
+            gs-min-w="4"
+            gs-min-h="3"
+          >
+            <div className={widgetShellClassName}>
+              <CanvasWidget onOpenCanvas={() => setActiveTab("canvas")} />
             </div>
           </div>
 
