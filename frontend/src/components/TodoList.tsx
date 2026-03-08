@@ -121,7 +121,7 @@ export default function TodoList({
           </li>
         ) : todos.length === 0 ? (
           <li className="py-10 text-center text-sm text-ink-faint">
-            <div className="mb-3 text-accent-muted">
+            <div className="mb-3 flex justify-center text-accent-muted">
               <ClipboardList size={32} strokeWidth={1.4} />
             </div>
             No tasks yet — add one above!

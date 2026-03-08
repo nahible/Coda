@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Pause, RotateCcw, BellOff } from "lucide-react";
-import { fetchSessions, createSession } from "../api/pomodoro";
 
 const getWorkSecs = () => Math.max(1, Math.round(parseFloat(localStorage.getItem("coda_work_mins") || "25") * 60));
 const getBreakSecs = () => Math.max(1, Math.round(parseFloat(localStorage.getItem("coda_break_mins") || "5") * 60));
@@ -10,7 +9,6 @@ export default function PomodoroTimer() {
   const [mode, setMode] = useState<"work" | "break">("work");
   const [remainingMs, setRemainingMs] = useState(getWorkSecs() * 1000);
   const [running, setRunning] = useState(false);
-  const [sessions, setSessions] = useState(0);
   const [isAlarmPlaying, setIsAlarmPlaying] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmRef = useRef<HTMLAudioElement | null>(null);
@@ -66,21 +64,6 @@ export default function PomodoroTimer() {
     return () => window.removeEventListener("coda_timer_updated", handleSettingsUpdate);
   }, [mode, running]);
 
-  // Fetch today's work sessions on mount
-  useEffect(() => {
-    fetchSessions()
-      .then((data) => {
-        const today = new Date().setHours(0, 0, 0, 0);
-        const todaysWork = data.filter((s) => {
-          if (s.session_type !== "work") return false;
-          const sessionDate = new Date(s.created_at).setHours(0, 0, 0, 0);
-          return sessionDate === today;
-        });
-        setSessions(todaysWork.length);
-      })
-      .catch(console.error);
-  }, []);
-
   useEffect(() => {
     if (running) {
       endTimeRef.current = Date.now() + remainingMsRef.current;
@@ -119,12 +102,9 @@ export default function PomodoroTimer() {
         endTimeRef.current = null;
 
         if (mode === "work") {
-          setSessions((s) => s + 1);
-          createSession(getWorkSecs(), "work").catch(console.error);
           playAlarm("/break-over-alarm.wav", 0.8);
           switchMode("break");
         } else {
-          createSession(getBreakSecs(), "break").catch(console.error);
           playAlarm("/break-over-alarm.wav", 0.8);
           switchMode("work");
         }
@@ -155,15 +135,7 @@ export default function PomodoroTimer() {
     endTimeRef.current = null;
     hasPlayedWarningRef.current = false;
 
-    // If we're resetting a work session that actually had some progress, log it as interrupted
     const workSecs = getWorkSecs();
-    const remainingSecs = Math.ceil(remainingMsRef.current / 1000);
-    if (mode === "work" && remainingSecs < workSecs) {
-      createSession(workSecs - remainingSecs, "work", "interrupted").catch(
-        console.error,
-      );
-    }
-
     setRunning(false);
     setRemainingMs(mode === "work" ? workSecs * 1000 : getBreakSecs() * 1000);
   }
@@ -293,13 +265,6 @@ export default function PomodoroTimer() {
         )}
       </div>
 
-      {/* Sessions — stays at bottom */}
-      <div className="text-[clamp(0.6rem,3cqmin,0.8rem)] text-ink-faint flex items-center gap-3 mt-2 h-[10cqh] max-h-8 min-h-6">
-        Sessions completed
-        <span className="bg-tag-bg px-2.5 py-0.5 rounded-full font-semibold text-ink-secondary text-[clamp(0.6rem,3cqmin,0.8rem)]">
-          {sessions}
-        </span>
-      </div>
     </div>
   );
 }

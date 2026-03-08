@@ -6,7 +6,6 @@ import chatbotRouter from "./routes/chatbot.js";
 import canvasRouter from "./routes/canvas.js";
 import todoRouter from "./routes/todo.js";
 import spotifyRouter from "./routes/spotify.js";
-import pomodoroRouter from "./routes/pomodoro.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 5001);
@@ -28,9 +27,6 @@ app.use("/todos", todoRouter);
 
 // Mount spotify routes at /auth/spotify
 app.use("/auth/spotify", spotifyRouter);
-
-// Mount pomodoro routes at /auth/pomodoro
-app.use("/auth/pomodoro", pomodoroRouter);
 
 app.get("/", (req, res) => {
   res.send("Coda Backend is running!");
