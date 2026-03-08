@@ -1,4 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+const SPOTIFY_API_BASE = `${API_BASE}/auth/spotify`;
 
 export interface SpotifyTrack {
   title: string;
@@ -13,15 +14,15 @@ export interface SpotifyTrack {
  * Redirects the user to the backend to start the Spotify OAuth flow.
  */
 export function connectSpotify(): void {
-  window.location.href = `${API_BASE}/spotify/auth`;
+  window.location.href = `${SPOTIFY_API_BASE}/auth`;
 }
 
 /**
  * Checks if the current user has connected their Spotify account.
  */
-export async function fetchSpotifyStatus(token: string): Promise<boolean> {
-  const res = await fetch(`${API_BASE}/spotify/status`, {
-    headers: { Authorization: `Bearer ${token}` },
+export async function fetchSpotifyStatus(): Promise<boolean> {
+  const res = await fetch(`${SPOTIFY_API_BASE}/status`, {
+    credentials: "include",
   });
   if (!res.ok) return false;
   const data = await res.json();
@@ -31,9 +32,9 @@ export async function fetchSpotifyStatus(token: string): Promise<boolean> {
 /**
  * Gets the track currently playing on the user's Spotify account.
  */
-export async function fetchNowPlaying(token: string): Promise<SpotifyTrack | null> {
-  const res = await fetch(`${API_BASE}/spotify/now-playing`, {
-    headers: { Authorization: `Bearer ${token}` },
+export async function fetchNowPlaying(): Promise<SpotifyTrack | null> {
+  const res = await fetch(`${SPOTIFY_API_BASE}/now-playing`, {
+    credentials: "include",
   });
   
   if (res.status === 204) return null; // No active device playing
@@ -43,33 +44,33 @@ export async function fetchNowPlaying(token: string): Promise<SpotifyTrack | nul
 }
 
 /** Play Spotify */
-export async function playSpotify(token: string) {
-  await fetch(`${API_BASE}/spotify/play`, {
+export async function playSpotify() {
+  await fetch(`${SPOTIFY_API_BASE}/play`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
   });
 }
 
 /** Pause Spotify */
-export async function pauseSpotify(token: string) {
-  await fetch(`${API_BASE}/spotify/pause`, {
+export async function pauseSpotify() {
+  await fetch(`${SPOTIFY_API_BASE}/pause`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
   });
 }
 
 /** Skip to Next Track */
-export async function skipNextSpotify(token: string) {
-  await fetch(`${API_BASE}/spotify/next`, {
+export async function skipNextSpotify() {
+  await fetch(`${SPOTIFY_API_BASE}/next`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
   });
 }
 
 /** Skip to Previous Track */
-export async function skipPrevSpotify(token: string) {
-  await fetch(`${API_BASE}/spotify/previous`, {
+export async function skipPrevSpotify() {
+  await fetch(`${SPOTIFY_API_BASE}/previous`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
   });
 }

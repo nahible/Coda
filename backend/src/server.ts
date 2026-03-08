@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import authRouter from "./routes/auth.js";
 import todoRouter from "./routes/todo.js";
+import spotifyRouter from "./routes/spotify.js";
+import pomodoroRouter from "./routes/pomodoro.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 5001);
@@ -19,6 +21,12 @@ app.use(express.json());
 // Mount auth routes at /auth
 app.use("/auth", authRouter);
 app.use("/todos", todoRouter);
+
+// Mount spotify routes at /auth/spotify
+app.use("/auth/spotify", spotifyRouter);
+
+// Mount pomodoro routes at /auth/pomodoro
+app.use("/auth/pomodoro", pomodoroRouter);
 
 app.get("/", (req, res) => {
   res.send("Coda Backend is running!");

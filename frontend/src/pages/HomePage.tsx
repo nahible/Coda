@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { GridStack } from 'gridstack';
-import type { AuthUser } from '../api/auth';
+import { useState, useEffect, useRef } from "react";
+import { GridStack } from "gridstack";
+import type { AuthUser } from "../api/auth";
 import {
   createTodoByUserId,
   deleteTodoByUserId,
@@ -8,12 +8,12 @@ import {
   setTodoCompletedByUserId,
   setTodoTextByUserId,
   type Todo,
-} from '../api/todos';
-import Sidebar from '../components/Sidebar';
-import SpotifyPlayer from '../components/SpotifyPlayer';
-import PomodoroTimer from '../components/PomodoroTimer';
-import TodoList from '../components/TodoList';
-import ChatBot from '../components/ChatBot';
+} from "../api/todos";
+import Sidebar from "../components/Sidebar";
+import SpotifyPlayer from "../components/SpotifyPlayer";
+import PomodoroTimer from "../components/PomodoroTimer";
+import TodoList from "../components/TodoList";
+import ChatBot from "../components/ChatBot";
 
 type HomePageProps = {
   onLogout: () => void | Promise<void>;
@@ -21,12 +21,12 @@ type HomePageProps = {
 };
 
 const widgetShellClassName = [
-  'grid-stack-item-content',
-  'flex flex-col overflow-hidden rounded-[24px] border border-border-soft bg-panel p-6',
-  'shadow-[0_1px_3px_rgba(100,80,140,0.02),0_4px_16px_rgba(100,80,140,0.04),0_12px_40px_rgba(100,80,140,0.06),inset_0_1.5px_0_rgba(255,255,255,0.5)]',
-  'backdrop-blur-[10px] transition-[box-shadow] duration-300',
-  'hover:shadow-[0_1px_3px_rgba(100,80,140,0.03),0_6px_20px_rgba(100,80,140,0.06),0_16px_48px_rgba(100,80,140,0.08),inset_0_1.5px_0_rgba(255,255,255,0.6)]',
-].join(' ');
+  "grid-stack-item-content",
+  "flex flex-col overflow-hidden rounded-[24px] border border-border-soft bg-panel p-6",
+  "shadow-[0_1px_3px_rgba(100,80,140,0.02),0_4px_16px_rgba(100,80,140,0.04),0_12px_40px_rgba(100,80,140,0.06),inset_0_1.5px_0_rgba(255,255,255,0.5)]",
+  "backdrop-blur-[10px] transition-[box-shadow] duration-300",
+  "hover:shadow-[0_1px_3px_rgba(100,80,140,0.03),0_6px_20px_rgba(100,80,140,0.06),0_16px_48px_rgba(100,80,140,0.08),inset_0_1.5px_0_rgba(255,255,255,0.6)]",
+].join(" ");
 
 export default function HomePage({ onLogout, user }: HomePageProps) {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -46,11 +46,22 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           float: true,
           animate: true,
           resizable: {
-            handles: 'se',
+            handles: "se",
           },
         },
-        gridRef.current
+        gridRef.current,
       );
+
+      // Forcefully apply minimum size constraints that HTML attributes sometimes drop
+      const spotifyEl = document.getElementById("spotify-item");
+      if (spotifyEl && gridInstanceRef.current) {
+        gridInstanceRef.current.update(spotifyEl, { minW: 3, minH: 4 });
+      }
+
+      const pomodoroEl = document.getElementById("pomodoro-item");
+      if (pomodoroEl && gridInstanceRef.current) {
+        gridInstanceRef.current.update(pomodoroEl, { minW: 2, minH: 4 });
+      }
     }
 
     return () => {
@@ -83,7 +94,9 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
 
         console.error(error);
         setTodosError(
-          error instanceof Error ? error.message : 'Unable to load your tasks right now.',
+          error instanceof Error
+            ? error.message
+            : "Unable to load your tasks right now.",
         );
       } finally {
         if (isActive) {
@@ -110,7 +123,9 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
     } catch (error) {
       console.error(error);
       setTodosError(
-        error instanceof Error ? error.message : 'Unable to create your task right now.',
+        error instanceof Error
+          ? error.message
+          : "Unable to create your task right now.",
       );
       return false;
     } finally {
@@ -123,7 +138,10 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
     setTodosError(null);
 
     try {
-      const updatedTodo = await setTodoCompletedByUserId(todo.id, !todo.completed);
+      const updatedTodo = await setTodoCompletedByUserId(
+        todo.id,
+        !todo.completed,
+      );
       setTodos((prev) =>
         prev.map((currentTodo) =>
           currentTodo.id === updatedTodo.id ? updatedTodo : currentTodo,
@@ -132,7 +150,9 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
     } catch (error) {
       console.error(error);
       setTodosError(
-        error instanceof Error ? error.message : 'Unable to update your task right now.',
+        error instanceof Error
+          ? error.message
+          : "Unable to update your task right now.",
       );
     } finally {
       setIsTodoMutating(false);
@@ -149,7 +169,9 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
     } catch (error) {
       console.error(error);
       setTodosError(
-        error instanceof Error ? error.message : 'Unable to delete your task right now.',
+        error instanceof Error
+          ? error.message
+          : "Unable to delete your task right now.",
       );
     } finally {
       setIsTodoMutating(false);
@@ -171,7 +193,9 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
     } catch (error) {
       console.error(error);
       setTodosError(
-        error instanceof Error ? error.message : 'Unable to rename your task right now.',
+        error instanceof Error
+          ? error.message
+          : "Unable to rename your task right now.",
       );
       return false;
     } finally {
@@ -188,21 +212,46 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
       <main className="flex-1 min-h-0 overflow-y-auto">
         <div className="grid-stack min-h-full" ref={gridRef}>
           {/* Spotify Player */}
-          <div className="grid-stack-item" gs-x="0" gs-y="0" gs-w="4" gs-h="6" gs-min-w="3" gs-min-h="5">
+          <div
+            className="grid-stack-item"
+            gs-x="0"
+            gs-y="0"
+            gs-w="4"
+            gs-h="6"
+            gs-min-w="3"
+            gs-min-h="5"
+          >
             <div className={widgetShellClassName}>
               <SpotifyPlayer />
             </div>
           </div>
 
           {/* Pomodoro Timer */}
-          <div className="grid-stack-item" gs-x="0" gs-y="6" gs-w="4" gs-h="8" gs-min-w="3" gs-min-h="6">
-            <div className={widgetShellClassName}>
+          <div
+            className="grid-stack-item"
+            id="pomodoro-item"
+            gs-x="0"
+            gs-y="6"
+            gs-w="4"
+            gs-h="8"
+            gs-min-w="2"
+            gs-min-h="4"
+          >
+            <div className="grid-stack-item-content">
               <PomodoroTimer />
             </div>
           </div>
 
           {/* Todo List */}
-          <div className="grid-stack-item" gs-x="0" gs-y="14" gs-w="4" gs-h="6" gs-min-w="3" gs-min-h="4">
+          <div
+            className="grid-stack-item"
+            gs-x="0"
+            gs-y="14"
+            gs-w="4"
+            gs-h="6"
+            gs-min-w="3"
+            gs-min-h="4"
+          >
             <div className={widgetShellClassName}>
               <TodoList
                 todos={todos}
@@ -218,7 +267,15 @@ export default function HomePage({ onLogout, user }: HomePageProps) {
           </div>
 
           {/* ChatBot */}
-          <div className="grid-stack-item" gs-x="4" gs-y="0" gs-w="8" gs-h="20" gs-min-w="4" gs-min-h="8">
+          <div
+            className="grid-stack-item"
+            gs-x="4"
+            gs-y="0"
+            gs-w="8"
+            gs-h="20"
+            gs-min-w="4"
+            gs-min-h="8"
+          >
             <div className={widgetShellClassName}>
               <ChatBot />
             </div>
